@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Move-Item *)",
+      "Bash(powershell *)",
+      "Bash(composer require *)",
+      "Bash(php artisan *)",
+      "Bash(Select-Object -First 60)",
+      "Bash(php \"c:/laragon/www/CheckKos/artisan\" route:list)",
+      "Bash(php -l \"c:/laragon/www/CheckKos/app/Http/Controllers/ReportController.php\")",
+      "Bash(php -l \"c:/laragon/www/CheckKos/database/migrations/2024_01_01_000012_add_fields_to_reports_table.php\")",
+      "Bash(php \"c:/laragon/www/CheckKos/artisan\" vendor:publish --provider=\"Laravel\\\\Sanctum\\\\SanctumServiceProvider\")",
+      "Bash(php -l \"c:/laragon/www/CheckKos/app/Http/Controllers/Api/V1/AuthApiController.php\")",
+      "Bash(php -l \"c:/laragon/www/CheckKos/app/Services/QueueService.php\")",
+      "Bash(php -l \"c:/laragon/www/CheckKos/app/Notifications/SmsNotification.php\")",
+      "Bash(php -l \"c:/laragon/www/CheckKos/config/notification.php\")",
+      "Bash(php -l \"c:/laragon/www/CheckKos/config/queue.php\")",
+      "Bash(php \"c:/laragon/www/CheckKos/artisan\" config:clear)",
+      "Bash(php \"c:/laragon/www/CheckKos/artisan\" about)",
+      "Bash(php -l app/Http/Controllers/Admin/KosController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/DashboardController.php)",
+      "Bash(php -l app/Http/Controllers/Owner/DashboardController.php)",
+      "Bash(php -l app/Services/KosService.php)"
+    ]
+  }
+}

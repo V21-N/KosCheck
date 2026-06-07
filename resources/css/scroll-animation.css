@@ -1,0 +1,120 @@
+/* Scroll Animation Styles */
+
+/* Base animation state - invisible and translated down */
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: scrollFadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-animate-in {
+    opacity: 1;
+    animation: scrollFadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Multiple animation styles for variety */
+.scroll-animate.slide-left {
+    transform: translateX(-50px);
+    animation: scrollSlideInLeft 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-animate.slide-right {
+    transform: translateX(50px);
+    animation: scrollSlideInRight 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-animate.scale-up {
+    transform: scale(0.9);
+    animation: scrollScaleIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.scroll-animate.rotate-in {
+    transform: rotate(-5deg) scale(0.95);
+    animation: scrollRotateIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Keyframe animations */
+@keyframes scrollFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scrollSlideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scrollSlideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scrollScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes scrollRotateIn {
+    from {
+        opacity: 0;
+        transform: rotate(-5deg) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: rotate(0) scale(1);
+    }
+}
+
+/* Container for managing child animations */
+.scroll-animate-container {
+    /* Optional: Can add styling to container if needed */
+}
+
+.scroll-animate-container > * {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: scrollFadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Mobile optimization */
+@media (prefers-reduced-motion: reduce) {
+    .scroll-animate,
+    .scroll-animate.slide-left,
+    .scroll-animate.slide-right,
+    .scroll-animate.scale-up,
+    .scroll-animate.rotate-in {
+        opacity: 1;
+        transform: none !important;
+        animation: none !important;
+    }
+
+    .scroll-animate-container > * {
+        opacity: 1;
+        transform: none !important;
+        animation: none !important;
+    }
+}
