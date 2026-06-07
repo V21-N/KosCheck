@@ -11,12 +11,12 @@
       "dest": "/public/build/$1"
     },
     {
-      "src": "/(css|js|images|favicon.png)/(.*)",
+      "src": "/(css|js|images|favicon.png|favicon.ico)/(.*)",
       "dest": "/public/$1/$2"
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.php"
+      "dest": "api/index.php"
     }
   ]
 }

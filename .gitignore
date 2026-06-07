@@ -24,3 +24,6 @@ Homestead.yaml
 Thumbs.db
 prd_new.prd
 .vercel
+
+.vercel
+.env*
