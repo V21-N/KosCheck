@@ -20,7 +20,16 @@
       "Bash(php -l app/Http/Controllers/Admin/KosController.php)",
       "Bash(php -l app/Http/Controllers/Admin/DashboardController.php)",
       "Bash(php -l app/Http/Controllers/Owner/DashboardController.php)",
-      "Bash(php -l app/Services/KosService.php)"
+      "Bash(php -l app/Services/KosService.php)",
+      "Bash(Remove-Item -Path \"c:\\\\laragon\\\\www\\\\CheckKos\\\\public\\\\images\\\\kos-1.png\" -Force)",
+      "Bash(Remove-Item -Path \"c:\\\\laragon\\\\www\\\\CheckKos\\\\public\\\\images\\\\kos-2.png\" -Force)",
+      "Bash(Remove-Item -Path \"c:\\\\laragon\\\\www\\\\CheckKos\\\\public\\\\images\\\\kos-bedroom.png\" -Force)",
+      "Bash(Remove-Item -Path \"c:\\\\laragon\\\\www\\\\CheckKos\\\\public\\\\images\\\\kos-placeholder.png\" -Force)",
+      "Bash(Remove-Item -Path \"c:\\\\laragon\\\\www\\\\CheckKos\\\\public\\\\images\\\\kos-kitchen.png\" -Force)",
+      "Bash(rm -f \"c:/laragon/www/CheckKos/public/images/kos-1.png\" \"c:/laragon/www/CheckKos/public/images/kos-2.png\" \"c:/laragon/www/CheckKos/public/images/kos-bedroom.png\" \"c:/laragon/www/CheckKos/public/images/kos-placeholder.png\" \"c:/laragon/www/CheckKos/public/images/kos-kitchen.png\" \"c:/laragon/www/CheckKos/public/images/logo-auth-footer.png\" \"c:/laragon/www/CheckKos/public/images/logo-auth-navbar.png\" \"c:/laragon/www/CheckKos/public/images/logo-footer.png\" \"c:/laragon/www/CheckKos/public/images/logo-hero.png\" \"c:/laragon/www/CheckKos/public/images/logo-navbar.png\" \"c:/laragon/www/CheckKos/public/images/logo-owner.png\" && echo \"Deleted unnecessary images successfully\")"
+    ],
+    "additionalDirectories": [
+      "c:\\laragon\\www\\CheckKos\\public\\images"
     ]
   }
 }

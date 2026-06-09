@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends(request()->routeIs('dashboard.kos.show') ? 'layouts.owner' : 'layouts.app')
 @section('title', ($kos->name ?? 'Detail Kos') . ' — KosCheck')
 
 @section('content')
 @php
-    $fallbackImage = asset('images/kos-placeholder.png');
+    $fallbackImage = asset('images/hero-illustration.png');
 
     $resolveImage = function (?string $path) use ($fallbackImage): string {
         $path = trim((string) $path);
@@ -227,7 +227,9 @@
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-lg font-bold">Review Mahasiswa</h2>
                         <div class="flex items-center gap-3">
-                            <a href="{{ route('kos.review.create', $kos) }}" class="text-sm font-semibold text-primary">Tulis Review</a>
+                            @if(auth()->check() && auth()->user()->role === 'mahasiswa')
+                                <a href="{{ route('student.kos.review.create', $kos->id) }}" class="text-sm font-semibold text-primary">Tulis Review</a>
+                            @endif
                             <a href="#" class="text-sm font-semibold text-primary">Lihat Semua</a>
                         </div>
                     </div>
@@ -288,7 +290,7 @@
             </div>
 
             <div class="lg:col-span-1">
-                <div class="sticky top-24">
+                <div>
                     <div class="card card-elevated p-4 md:p-6 mb-0 md:mb-4 fixed md:relative bottom-[env(safe-area-inset-bottom)] md:bottom-auto left-0 right-0 z-[60] md:z-auto rounded-t-2xl md:rounded-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] md:shadow-none border-t border-border-light md:border-none flex md:block items-center justify-between gap-4 md:gap-0 bg-white">
                         <div class="md:hidden">
                             <div class="text-[0.65rem] text-text-muted line-through mb-0.5">Rp {{ $price }}</div>
@@ -300,15 +302,21 @@
                         </div>
 
                         <div class="flex-1 md:flex-none">
-                            @if($stock > 0)
-                                <a href="{{ route('booking', ['slug' => $kos->slug]) }}" class="btn btn-primary btn-full md:mb-3" data-hover="lift">
-                                    Booking <span class="hidden md:inline">Sekarang</span>
+                            @if(auth()->check() && auth()->user()->role === 'owner' && auth()->id() === $kos->user_id)
+                                <a href="{{ route('dashboard.booking', ['search' => $kos->name]) }}" class="btn btn-primary btn-full md:mb-3" data-hover="lift">
+                                    Kelola Booking
                                 </a>
                             @else
-                                <button disabled class="btn btn-full md:mb-3 bg-red-100 text-red-600" style="cursor:not-allowed;">Penuh</button>
+                                @if($stock > 0)
+                                    <a href="{{ route('booking', ['slug' => $kos->slug]) }}" class="btn btn-primary btn-full md:mb-3" data-hover="lift">
+                                        Booking <span class="hidden md:inline">Sekarang</span>
+                                    </a>
+                                @else
+                                    <button disabled class="btn btn-full md:mb-3 bg-red-100 text-red-600" style="cursor:not-allowed;">Penuh</button>
+                                @endif
                             @endif
 
-                            @if($whatsappUrl)
+                            @if($whatsappUrl && !(auth()->check() && auth()->id() === $kos->user_id))
                                 <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="hidden md:flex btn btn-white btn-full text-green-brand border-green-brand hover:bg-green-50 items-center justify-center gap-2" data-hover="lift">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -320,9 +328,11 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('kos.review.create', $kos) }}" class="hidden md:flex btn btn-primary-outline btn-full mb-4" data-hover="lift">
+                    @if(auth()->check() && auth()->user()->role === 'mahasiswa')
+                    <a href="{{ route('student.kos.review.create', $kos->id) }}" class="hidden md:flex btn btn-primary-outline btn-full mb-4" data-hover="lift">
                         Bagikan Pengalaman
                     </a>
+                    @endif
 
                     <div class="mt-4 flex items-center justify-center gap-1 text-xs text-text-muted">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,9 +340,8 @@
                         </svg>
                         Terakhir diupdate {{ $kos->updated_at?->diffForHumans() ?? 'baru saja' }}
                     </div>
-                </div>
 
-                <div class="card p-6 text-center mt-6 md:mt-0">
+                <div class="card p-6 text-center mt-6">
                     <div class="relative inline-block mb-3">
                         <div class="w-16 h-16 rounded-full bg-gray-200 overflow-hidden mx-auto">
                             <img src="{{ $ownerAvatar }}" alt="{{ $ownerName }}" class="w-full h-full object-cover">
@@ -358,6 +367,7 @@
                         </div>
                     </div>
                     <p class="text-xs text-text-muted">Bergabung sejak {{ $owner?->created_at?->translatedFormat('F Y') ?? '-' }}</p>
+                </div>
                 </div>
             </div>
         </div>

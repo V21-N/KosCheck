@@ -7,7 +7,7 @@
         $path = trim((string) $path);
 
         if ($path === '') {
-            return asset('images/kos-placeholder.png');
+            return asset('images/hero-illustration.png');
         }
 
         if (preg_match('/^(https?:|data:)/i', $path)) {
@@ -143,7 +143,7 @@
                 <div class="mb-8">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-lg font-bold">Review Mahasiswa</h2>
-                        <a href="{{ route('kos.review.create', $kos) }}" class="text-sm font-semibold text-primary">Tulis Review</a>
+                        <a href="{{ route('student.kos.review.create', ['id' => $kos->id]) }}" class="text-sm font-semibold text-primary">Tulis Review</a>
                     </div>
                     <div class="space-y-4">
                         @forelse($kos->reviews as $review)

@@ -37,10 +37,6 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         Keamanan
                     </a>
-                    <a href="#galon" class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-muted hover:bg-gray-100 hover:text-text font-medium text-sm transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                        Layanan Galon
-                    </a>
                     <a href="#pemilik" class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-muted hover:bg-gray-100 hover:text-text font-medium text-sm transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         Pemilik Kos
@@ -120,20 +116,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Layanan Air Galon --}}
-                <div id="galon">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
-                            <span class="text-lg">💧</span>
-                        </div>
-                        <h2 class="text-xl font-bold text-text">Layanan Air Galon</h2>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 text-sm text-blue-800 leading-relaxed">
-                        Kami bekerja sama dengan partner galon lokal untuk memastikan stok air minum di kos Anda selalu tersedia dengan harga kompetitif dan pengiriman cepat. Hubungi admin layanan galon kami jika mengalami kendala.
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>

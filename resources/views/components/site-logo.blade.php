@@ -5,20 +5,8 @@
 ])
 
 @php
-    // Map variants to specific pre-sized logo files
-    $logoFile = match ($variant) {
-        'auth-navbar' => 'logo-auth-navbar.png',
-        'footer' => 'logo-footer.png',
-        'auth-footer' => 'logo-auth-footer.png',
-        'owner' => 'logo-owner.png',
-        'hero' => 'logo-hero.png',
-        default => 'logo-navbar.png',
-    };
-
-    $logoPath = public_path("images/{$logoFile}");
-    $logoVersion = file_exists($logoPath) ? filemtime($logoPath) : time();
-    $logoUrl = asset("images/{$logoFile}") . '?v=' . $logoVersion;
-
+    // All variants now use the central logo.png
+    // Dimensions are maintained for consistent visual sizing across variants
     $dimensions = match ($variant) {
         'auth-navbar' => ['width' => 88, 'height' => 76],
         'footer' => ['width' => 160, 'height' => 132],
@@ -27,9 +15,11 @@
         'hero' => ['width' => 219, 'height' => 180],
         default => ['width' => 110, 'height' => 110],
     };
-@endphp
 
-@php
+    $logoPath = public_path('images/logo.png');
+    $logoVersion = file_exists($logoPath) ? filemtime($logoPath) : time();
+    $logoUrl = asset('images/logo.png') . '?v=' . $logoVersion;
+
     $style = "width:{$dimensions['width']}px;height:{$dimensions['height']}px";
 @endphp
 

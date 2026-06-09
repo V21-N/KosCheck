@@ -74,11 +74,19 @@
     </div>
 </div>
 
+@php
+    $resolveImage = function (?string $path): string {
+        $path = trim((string) $path);
+        if ($path === '') return asset('images/hero-illustration.png');
+        if (preg_match('/^(https?:|data:)/i', $path)) return $path;
+        if (str_starts_with($path, '/')) return $path;
+        return asset('storage/' . ltrim($path, '/'));
+    };
+@endphp
 <div class="space-y-5">
     @forelse($kosList as $kos)
         @php
-            $photo = $kos->photos->first();
-            $photoUrl = $photo?->url ? asset('storage/' . ltrim($photo->url, '/')) : asset('images/kos-bedroom.png');
+            $photoUrl = $resolveImage($kos->photos->first()?->url ?? null);
             $price = number_format((int) $kos->price, 0, ',', '.');
             $rating = $kos->reviews_count > 0 ? number_format((float) ($kos->avg_rating ?? 0), 1) : '-';
             $statusClass = $kos->status === 'active'
@@ -130,16 +138,29 @@
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
-                    <div class="flex gap-2 w-full md:w-auto">
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
                         <a href="{{ route('dashboard.kos.edit', $kos) }}" class="btn btn-primary px-5 py-2 text-xs">Edit Kos</a>
-                        <a href="{{ route('kos.show', ['slug' => $kos->slug]) }}" class="btn btn-white px-5 py-2 text-xs border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+                        <a href="{{ route('dashboard.kos.show', ['slug' => $kos->slug]) }}" class="btn btn-white px-5 py-2 text-xs border-gray-200 hover:bg-gray-50 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             Lihat Detail
                         </a>
+                        <form action="{{ route('dashboard.kos.toggle', $kos) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="btn btn-white px-5 py-2 text-xs border-gray-200 hover:bg-gray-50 flex items-center gap-2 {{ $kos->is_active ? 'text-red-600' : 'text-green-600' }}" onclick="return confirm('Apakah Anda yakin ingin {{ $kos->is_active ? 'menonaktifkan' : 'mengaktifkan' }} properti ini?')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    @if($kos->is_active)
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                                    @else
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    @endif
+                                </svg>
+                                {{ $kos->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                            </button>
+                        </form>
                     </div>
                     <a href="{{ route('dashboard.booking', ['search' => $kos->name]) }}" class="btn btn-sm bg-green-700 text-white hover:bg-green-800 flex items-center gap-1 rounded-full px-4 border-none shadow-sm text-xs font-bold" data-hover="lift">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Booking
+                        Cek Booking
                     </a>
                 </div>
             </div>

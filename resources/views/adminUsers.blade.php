@@ -9,7 +9,7 @@
 @endsection
 
 @section('topbar_right')
-    <span class="badge badge-verified bg-green-100 text-green-800 border border-green-200 hidden md:inline-flex">Frontend Only</span>
+    <span class="badge badge-verified bg-green-100 text-green-800 border border-green-200 hidden md:inline-flex">Database Connected</span>
 @endsection
 
 @section('content')
@@ -19,10 +19,13 @@
         <div class="flex gap-2 flex-wrap">
             <button @click="filter='semua'" :class="filter==='semua'?'bg-primary text-white':'bg-white border'" class="btn btn-sm px-4">Semua User</button>
             <button @click="filter='Mahasiswa'" :class="filter==='Mahasiswa'?'bg-blue-600 text-white':'bg-white border'" class="btn btn-sm px-4">Mahasiswa</button>
-            <button @click="filter='Pemilik Kos'" :class="filter==='Pemilik Kos'?'bg-orange-600 text-white':'bg-white border'" class="btn btn-sm px-4">Pemilik Kos</button>
+            <button @click="filter='Owner'" :class="filter==='Owner'?'bg-orange-600 text-white':'bg-white border'" class="btn btn-sm px-4">Pemilik Kos</button>
             <button @click="filter='Admin'" :class="filter==='Admin'?'bg-purple-600 text-white':'bg-white border'" class="btn btn-sm px-4">Admin</button>
         </div>
-        <button @click="inviteAdmin()" class="btn btn-primary btn-sm">Undang Admin Baru</button>
+        <form action="{{ route('admin.users') }}" method="GET" class="flex">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari user..." class="border rounded-l-lg px-3 py-1 text-sm outline-none">
+            <button type="submit" class="bg-primary text-white px-3 py-1 rounded-r-lg text-sm">Cari</button>
+        </form>
     </div>
 
     <div class="card border-none shadow-sm divide-y divide-border-light">
@@ -37,11 +40,19 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-xs px-3 py-1 rounded-full" :class="user.role === 'Admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100'" x-text="user.role"></span>
-                    <span class="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700" x-text="user.status"></span>
-                    <button @click="manageUser(user)" class="btn btn-white btn-sm">Kelola</button>
+                    <span class="text-xs px-3 py-1 rounded-full" :class="user.status === 'Aktif' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'" x-text="user.status"></span>
+                    <button @click="manageUser(user)" class="btn btn-white btn-sm">Ganti Status</button>
+                    
+                    <form :action="`/admin/users/${user.id}/toggle`" method="POST" :id="`toggle-form-${user.id}`" class="hidden">
+                        @csrf
+                    </form>
                 </div>
             </div>
         </template>
+    </div>
+    
+    <div class="mt-4">
+        {{ $users->links() }}
     </div>
 
 </div>
@@ -51,14 +62,15 @@
 function adminUsers() {
     return {
         filter: 'semua',
-        users: [
-            { id: 1, name: 'Budi Santoso', email: 'budi@kampus.id', role: 'Mahasiswa', status: 'Aktif' },
-            { id: 2, name: 'Ibu Sarah Wijaya', email: 'sarah@email.com', role: 'Pemilik Kos', status: 'Terverifikasi' },
-            { id: 3, name: 'Tim Moderasi 2', email: 'mod2@koscheck.com', role: 'Admin', status: 'Aktif' },
-            { id: 4, name: 'Andi Pratama', email: 'andi@kampus.id', role: 'Mahasiswa', status: 'Aktif' },
-            { id: 5, name: 'Pak Dodi Firmansyah', email: 'dodi@email.com', role: 'Pemilik Kos', status: 'Terverifikasi' },
-            { id: 6, name: 'Siti Nurhaliza', email: 'siti@kampus.id', role: 'Mahasiswa', status: 'Aktif' },
-        ],
+        users: {!! json_encode(collect($users->items())->map(function($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => ucfirst($user->role),
+                'status' => $user->is_active ? 'Aktif' : 'Nonaktif',
+            ];
+        })) !!},
 
         get filteredUsers() {
             if (this.filter === 'semua') return this.users;
@@ -66,14 +78,8 @@ function adminUsers() {
         },
 
         manageUser(user) {
-            alert(`Mengelola user: ${user.name} (simulasi)`);
-        },
-
-        inviteAdmin() {
-            const email = prompt('Email admin baru:');
-            if (email) {
-                this.users.push({ id: Date.now(), name: 'Admin Baru', email, role: 'Admin', status: 'Aktif' });
-                alert('Undangan admin dikirim (simulasi).');
+            if (confirm(`Ubah status aktif user ${user.name}?`)) {
+                document.getElementById(`toggle-form-${user.id}`).submit();
             }
         }
     }

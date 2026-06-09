@@ -1,5 +1,5 @@
 @php
-    $accountUrl = request()->routeIs('profil') ? route('profil') : route('login');
+    $accountUrl = auth()->check() ? route('mahasiswa.profil') : route('login');
 
     $items = [
         [
@@ -29,7 +29,7 @@
         [
             'label' => 'Akun',
             'href' => $accountUrl,
-            'active' => request()->routeIs('login', 'register', 'profil'),
+            'active' => request()->routeIs('login', 'register', 'mahasiswa.profil'),
             'icon' => '<circle cx="12" cy="8" r="3.25" stroke-width="1.8"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 19c1.75-2.25 4.08-3.38 7-3.38 2.92 0 5.25 1.13 7 3.38"/>',
         ],
     ];

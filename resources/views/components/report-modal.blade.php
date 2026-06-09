@@ -89,7 +89,7 @@
                 <p class="text-xs text-text-muted mb-2">Melaporkan:</p>
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                        <img :src="targetImage || '{{ asset('images/kos-placeholder.png') }}'" class="w-full h-full object-cover" alt="Target">
+                        <img :src="targetImage || '{{ asset('images/hero-illustration.png') }}'" class="w-full h-full object-cover" alt="Target">
                     </div>
                     <div class="flex-1 min-w-0">
                         <h4 class="font-bold text-sm text-text truncate" x-text="targetName || 'Loading...'"></h4>

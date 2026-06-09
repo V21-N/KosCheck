@@ -44,7 +44,7 @@ class UpdateKosRequest extends FormRequest
             'phone' => 'nullable|string|max:20',
             'is_active' => 'sometimes|boolean',
             'facilities' => 'nullable|array',
-            'facilities.*' => 'exists:facilities,id',
+            'facilities.*' => 'nullable|string|max:50',
             'photos' => 'nullable|array|max:10',
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ];

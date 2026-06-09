@@ -6,7 +6,7 @@
         $path = trim((string) $path);
 
         if ($path === '') {
-            return asset('images/kos-placeholder.png');
+            return asset('images/hero-illustration.png');
         }
 
         if (preg_match('/^(https?:|data:)/i', $path)) {

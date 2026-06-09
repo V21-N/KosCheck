@@ -13,6 +13,97 @@ use Illuminate\Support\Facades\Auth;
 
 class KosController extends Controller
 {
+    /**
+     * Mahasiswa dashboard with all real data from DB.
+     */
+    public function dashboard()
+    {
+        $user = Auth::user();
+
+        // --- Saved Kos ---
+        $savedKos = $user->favoriteKos()
+            ->with('primaryPhoto')
+            ->latest('favorite_kos.created_at')
+            ->take(3)
+            ->get();
+        $savedKosCount = $user->favoriteKos()->count();
+
+        // --- Review Stats ---
+        $reviewCount = $user->reviews()->count();
+
+        // --- Booking Stats ---
+        $bookingActiveCount = $user->bookings()
+            ->whereIn('status', ['pending', 'approved'])
+            ->count();
+
+        // --- Recent Activities (composed from existing tables) ---
+        // Collect the latest entries from favorites, reviews, and bookings,
+        // then merge and sort by date descending, limit to 5.
+        $activities = collect();
+
+        // Favorites (from pivot timestamps)
+        $recentFavorites = $user->favoriteKos()
+            ->latest('favorite_kos.created_at')
+            ->take(5)
+            ->get();
+        foreach ($recentFavorites as $fav) {
+            $activities->push([
+                'icon' => 'heart',
+                'text' => 'Menyimpan ' . $fav->name,
+                'time' => $fav->pivot->created_at,
+            ]);
+        }
+
+        // Reviews
+        $recentReviews = $user->reviews()
+            ->with('kos')
+            ->latest('created_at')
+            ->take(5)
+            ->get();
+        foreach ($recentReviews as $rev) {
+            $activities->push([
+                'icon' => 'chat',
+                'text' => 'Menulis review di ' . ($rev->kos->name ?? 'Kos Dihapus'),
+                'time' => $rev->created_at,
+            ]);
+        }
+
+        // Bookings
+        $recentBookings = $user->bookings()
+            ->with('kos')
+            ->latest('created_at')
+            ->take(5)
+            ->get();
+        foreach ($recentBookings as $book) {
+            $activities->push([
+                'icon' => 'calendar',
+                'text' => 'Booking ' . ($book->kos->name ?? 'Kos Dihapus'),
+                'time' => $book->created_at,
+            ]);
+        }
+
+        // Sort descending by time, take latest 5
+        $activities = $activities
+            ->sortByDesc('time')
+            ->take(5)
+            ->values()
+            ->map(function ($act) {
+                return [
+                    'icon' => $act['icon'],
+                    'text' => $act['text'],
+                    'time' => $act['time']->diffForHumans(),
+                ];
+            });
+
+        return view('dashboardMahasiswa', compact(
+            'savedKos',
+            'savedKosCount',
+            'reviewCount',
+            'bookingActiveCount',
+            'activities',
+        ));
+    }
+
     public function index(Request $request)
     {
         // Only show verified (active) kos
@@ -36,8 +127,12 @@ class KosController extends Controller
 
         $kos = $query->get();
 
+        // Get user's saved kos IDs
+        $user = auth()->user();
+        $savedKosIds = $user ? $user->favoriteKos()->pluck('kos.id')->toArray() : [];
+
         // Transform for Alpine.js
-        $kosData = $kos->map(function($k) {
+        $kosData = $kos->map(function($k) use ($savedKosIds) {
             $facilities = $k->facilities->pluck('name')->toArray();
             $primaryPhoto = $k->photos->first();
             return [
@@ -55,6 +150,7 @@ class KosController extends Controller
                 'img' => $this->resolveImageUrl($primaryPhoto?->url),
                 'stock' => $k->available_rooms ?? 0,
                 'whatsappNumber' => $k->whatsapp ?? '',
+                'is_saved' => in_array($k->id, $savedKosIds),
             ];
         })->values();
 
@@ -142,7 +238,7 @@ class KosController extends Controller
     protected function resolveImageUrl(?string $path): string
     {
         if (!$path) {
-            return asset('images/kos-placeholder.png');
+            return asset('images/hero-illustration.png');
         }
 
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
@@ -181,7 +277,7 @@ class KosController extends Controller
 
         $query = Review::where('user_id', $userId)
             ->with(['kos.photos' => fn($q) => $q->orderBy('order')])
-            ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'approved' THEN 2 WHEN status = 'rejected' THEN 3 ELSE 4 END")
             ->latest();
 
         // Filter by status

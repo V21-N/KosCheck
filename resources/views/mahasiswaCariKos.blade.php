@@ -124,13 +124,13 @@
                         <template x-for="kos in filteredKos" :key="kos.slug">
                             <div class="card group" data-hover="lift" data-reveal>
                                 <div class="relative overflow-hidden aspect-[4/3]">
-                                    <img src="{{ asset('images/kos-placeholder.png') }}" :data-src="getImageSrc(kos)" :alt="kos.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                                    <img :src="getImageSrc(kos)" :alt="kos.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                                     <span x-show="kos.verified" class="absolute top-3 left-3 badge badge-verified text-[0.65rem]" x-cloak>
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                         TERVERIFIKASI
                                     </span>
-                                    <button type="button" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors" aria-label="Simpan kos">
-                                        <svg class="w-4 h-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                    <button type="button" @click.stop.prevent="toggleFavorite(kos)" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors" aria-label="Simpan kos">
+                                        <svg class="w-4 h-4 transition-colors" :class="kos.is_saved ? 'text-red-500 fill-current' : 'text-text-muted'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                                     </button>
                                 </div>
                                 <div class="p-4">
@@ -204,7 +204,7 @@
             verifiedOnly: false,
             storageBaseUrl: @json(asset('storage')),
             appBaseUrl: @json(url('/')),
-            placeholderImage: @json(asset('images/kos-placeholder.png')),
+            placeholderImage: @json(asset('images/hero-illustration.png')),
             allKos: [],
             filteredKos: [],
             init() {
@@ -281,6 +281,34 @@
             getWhatsAppLink(kos) {
                 const message = encodeURIComponent('Halo, saya tertarik dengan ' + kos.name + '. Apakah kamar masih tersedia?');
                 return 'https://wa.me/' + kos.whatsappNumber + '?text=' + message;
+            },
+            async toggleFavorite(kos) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const isSaved = kos.is_saved;
+                
+                // Optimistic update for snappy UI
+                kos.is_saved = !isSaved;
+                
+                try {
+                    // Implicit route model binding in ProfileController expects Kos ID by default
+                    const response = await fetch(`${this.appBaseUrl}/mahasiswa/favorite/${kos.id}`, {
+                        method: isSaved ? 'DELETE' : 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        // Revert on failure
+                        kos.is_saved = isSaved;
+                        console.error('Failed to update favorite status');
+                    }
+                } catch (error) {
+                    kos.is_saved = isSaved;
+                    console.error('Network error while updating favorite', error);
+                }
             },
             filterKos() {
                 const nameFilter = this.searchNama.trim().toLowerCase();

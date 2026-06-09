@@ -9,6 +9,7 @@ use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\NotificationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Mahasiswa\KosController as MahasiswaKosController;
+use App\Http\Controllers\Mahasiswa\ProfileController as MahasiswaProfileController;
 use App\Http\Controllers\Admin\KosController as AdminKosController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\AdController as AdminAdController;
@@ -94,8 +95,7 @@ Route::middleware('auth')->group(function () {
     | Review Routes (Authenticated Users - No Email Verification Required)
     |--------------------------------------------------------------------------
     */
-    Route::get('/kos/{kos}/review', [ReviewController::class, 'create'])->name('kos.review.create');
-    Route::post('/kos/{kos}/review', [ReviewController::class, 'store'])->name('kos.review.store');
+    // Route review telah dipindah ke dalam grup mahasiswa
     Route::post('/reviews/{review}/helpful', [ReviewController::class, 'helpful'])->name('reviews.helpful');
     Route::post('/reviews/{review}/report', [ReviewController::class, 'report'])->name('reviews.report');
 
@@ -105,12 +105,16 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:mahasiswa'])->group(function () {
-        Route::get('/mahasiswa', fn() => view('dashboardMahasiswa'))->name('student.dashboard');
+        Route::get('/mahasiswa/kos/{id}/review', [ReviewController::class, 'create'])->name('student.kos.review.create');
+        Route::post('/mahasiswa/kos/{id}/review', [ReviewController::class, 'store'])->name('student.kos.review.store');
+        Route::get('/mahasiswa', [MahasiswaKosController::class, 'dashboard'])->name('student.dashboard');
         Route::get('/mahasiswa/booking', [MahasiswaKosController::class, 'bookings'])->name('student.booking');
         Route::get('/mahasiswa/review', [MahasiswaKosController::class, 'reviews'])->name('student.review');
         Route::get('/mahasiswa/kos', [MahasiswaKosController::class, 'index'])->name('student.kos');
         Route::get('/mahasiswa/kos/{slug}', [MahasiswaKosController::class, 'show'])->name('student.kos.show');
-        Route::get('/profil', fn() => view('profilPengguna'))->name('profil');
+        Route::get('/mahasiswa/profil', [MahasiswaProfileController::class, 'index'])->name('mahasiswa.profil');
+        Route::post('/mahasiswa/favorite/{kos}', [MahasiswaProfileController::class, 'addFavorite'])->name('mahasiswa.favorite.add');
+        Route::delete('/mahasiswa/favorite/{kos}', [MahasiswaProfileController::class, 'removeFavorite'])->name('mahasiswa.favorite.remove');
         Route::get('/booking/{slug}', [KosController::class, 'booking'])->name('booking');
         Route::post('/booking/{slug}', [KosController::class, 'bookingStore'])->name('booking.store');
     });
@@ -125,6 +129,7 @@ Route::middleware('auth')->group(function () {
         Route::redirect('/dashboard', '/owner')->name('dashboard');
 
         Route::get('/properti', [DashboardController::class, 'kosIndex'])->name('dashboard.properti');
+        Route::get('/properti/kos/{slug}', [App\Http\Controllers\Web\KosController::class, 'show'])->name('dashboard.kos.show');
         Route::get('/kos/create', [DashboardController::class, 'kosCreate'])->name('dashboard.kos.create');
         Route::post('/kos', [DashboardController::class, 'store'])->name('dashboard.kos.store');
         Route::get('/kos/{kos}/edit', [DashboardController::class, 'kosEdit'])->name('dashboard.kos.edit');

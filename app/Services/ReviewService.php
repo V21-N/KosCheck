@@ -53,7 +53,7 @@ class ReviewService
     {
         return Review::where('user_id', $userId)
             ->with(['kos'])
-            ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'approved' THEN 2 WHEN status = 'rejected' THEN 3 ELSE 4 END")
             ->latest()
             ->get();
     }

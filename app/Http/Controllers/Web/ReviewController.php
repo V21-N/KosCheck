@@ -17,28 +17,30 @@ class ReviewController extends Controller
         protected ReviewService $reviewService
     ) {}
 
-    public function create(Kos $kos)
+    public function create($id)
     {
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu untuk memberikan review.');
         }
 
+        $kos = Kos::findOrFail($id);
         $existingReview = $this->reviewService->hasUserReviewed(Auth::id(), $kos->id);
 
         if ($existingReview) {
-            return redirect()->route('kos.show', $kos->slug)
+            return redirect()->route('student.kos.show', $kos->slug)
                 ->with('error', 'Anda sudah memberikan review untuk kos ini.');
         }
 
         return view('reviewCreate', compact('kos'));
     }
 
-    public function store(ReviewRequest $request, Kos $kos)
+    public function store(ReviewRequest $request, $id)
     {
+        $kos = Kos::findOrFail($id);
         $validated = $request->validated();
 
         if ($this->reviewService->hasUserReviewed(Auth::id(), $kos->id)) {
-            return redirect()->route('kos.show', $kos->slug)
+            return redirect()->route('student.kos.show', $kos->slug)
                 ->with('error', 'Anda sudah memberikan review untuk kos ini.');
         }
 
@@ -49,7 +51,7 @@ class ReviewController extends Controller
         ReviewCreated::dispatch($review, $kos);
 
         return redirect()
-            ->route('kos.show', $kos->slug)
+            ->route('student.kos.show', $kos->slug)
             ->with('success', 'Review berhasil dikirim dan sedang dalam proses moderasi. Terima kasih atas masukan Anda!');
     }
 

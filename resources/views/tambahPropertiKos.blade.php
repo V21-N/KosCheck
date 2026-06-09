@@ -2,6 +2,9 @@
 
 @php
     $isEditMode = request()->routeIs('dashboard.kos.edit');
+    if (!isset($kos)) {
+        $kos = null;
+    }
 @endphp
 
 @section('title', ($isEditMode ? 'Edit Properti' : 'Tambah Properti') . ' — KosCheck Manager')
@@ -33,22 +36,25 @@
             </button>
 
             {{-- Pilihan Galon --}}
-            <button type="button" @click="jenis = 'galon'"
-                    class="group p-8 border-2 border-border-light hover:border-primary rounded-2xl text-left transition-all hover:shadow-lg bg-white">
-                <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center mb-5 group-hover:bg-blue-200 transition-colors">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button type="button" disabled
+                    class="group relative p-8 border-2 border-border-light rounded-2xl text-left transition-all bg-gray-50 opacity-75 cursor-not-allowed overflow-hidden">
+                <div class="absolute top-4 right-4">
+                    <span class="text-[10px] font-bold tracking-widest uppercase px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Coming Soon</span>
+                </div>
+                <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center mb-5">
+                    <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-text mb-2">Partner Galon</h3>
-                <p class="text-sm text-text-muted">Usaha air galon / depot air minum untuk layanan kos.</p>
+                <h3 class="text-xl font-bold text-gray-600 mb-2">Partner Lainnya</h3>
+                <p class="text-sm text-gray-500">Tahap pengembangan selanjutnya.</p>
             </button>
         </div>
     </div>
     @endif
 
     {{-- ==================== FORM PROPERTI KOS (SUPER CREATIVE & LENGKAP) ==================== --}}
-    <div x-show="jenis === 'kos' || {{ $isEditMode ? 'true' : 'false' }}" x-data="kosFormData()">
+    <div x-show="jenis === 'kos' || {{ $isEditMode ? 'true' : 'false' }}" x-data="kosFormData()" x-init="init()">
         @if(!$isEditMode)
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold">Form Properti Kos</h2>
@@ -60,9 +66,13 @@
             
             {{-- FORM UTAMA --}}
             <div class="xl:col-span-7 space-y-8">
-                <form method="POST" action="{{ route('dashboard.kos.store') }}" enctype="multipart/form-data" class="space-y-8" @submit.prevent="submitKos($event)">
+                <form method="POST" action="{{ $isEditMode ? route('dashboard.kos.update', $kos) : route('dashboard.kos.store') }}" enctype="multipart/form-data" class="space-y-8" @submit.prevent="submitKos($event)">
                     @csrf
-                    @method('POST')
+                    @if($isEditMode)
+                        @method('PUT')
+                    @else
+                        @method('POST')
+                    @endif
                     <input type="hidden" name="gender" :value="form.gender">
                     <input type="hidden" name="whatsapp" :value="'{{ auth()->user()->phone ?? '' }}'">
 
@@ -367,7 +377,7 @@
                             </div>
 
                             <div class="flex items-baseline gap-2 mb-4">
-                                <span class="text-2xl font-extrabold text-primary" x-text="'Rp ' + (form.price || '0').toLocaleString()"></span>
+                                <span class="text-2xl font-extrabold text-primary" x-text="'Rp ' + (Number(form.price.toString().replace(/\\D/g, '')) || 0).toLocaleString('id-ID')"></span>
                                 <span class="text-xs text-text-muted">/ bulan</span>
                             </div>
 
@@ -386,7 +396,7 @@
                             <div x-show="form.facilities.length > 0" class="border-t pt-4">
                                 <div class="text-[10px] font-bold tracking-wider text-text-muted mb-2">FASILITAS UTAMA</div>
                                 <div class="flex flex-wrap gap-1.5">
-                                    <template x-for="fid in form.facilities.slice(0, 5)" :key="fid">
+                                    <template x-for="fid in topFacilities" :key="fid">
                                         <span class="text-[10px] px-2 py-0.5 bg-gray-100 rounded-full text-text-muted" x-text="getFacilityLabel(fid)"></span>
                                     </template>
                                 </div>
@@ -475,18 +485,62 @@ function kosFormData() {
         
         form: {
             images: [],
-            name: '',
-            address: '',
-            gender: 'putra',
-            totalRooms: '',
-            availableRooms: '',
-            roomSize: '',
-            price: '',
-            deposit: '',
-            longStayDiscount: false,
-            description: '',
-            facilities: [],
+            name: {!! json_encode(old('name', $kos->name ?? '')) !!},
+            address: {!! json_encode(old('address', $kos->address ?? '')) !!},
+            gender: {!! json_encode(old('gender', $kos->gender ?? 'putra')) !!},
+            totalRooms: {!! json_encode(old('totalRooms', $kos->total_rooms ?? '')) !!},
+            availableRooms: {!! json_encode(old('availableRooms', $kos->available_rooms ?? '')) !!},
+            roomSize: {!! json_encode(old('roomSize', $kos->room_size ?? '')) !!},
+            price: {!! json_encode(old('price', $kos->price ?? '')) !!},
+            deposit: {!! json_encode(old('deposit', $kos->deposit ?? '')) !!},
+            longStayDiscount: {{ old('longStayDiscount', $kos->long_stay_discount ?? 'false') ? 'true' : 'false' }},
+            description: {!! json_encode(old('description', $kos->description ?? '')) !!},
+            facilities: {!! isset($kos) ? json_encode(
+                $kos->facilities->map(function($f) {
+                    $slugToKey = [
+                        'wifi' => 'wifi',
+                        'ac' => 'ac',
+                        'bathroom_in' => 'km-dalam',
+                        'bed' => 'kasur',
+                        'wardrobe' => 'lemari',
+                        'parking_motor' => 'parkir',
+                        'kitchen' => 'dapur',
+                        'cctv' => 'cctv',
+                        'laundry' => 'laundry',
+                        'electricity_token' => 'listrik',
+                        'water_supply' => 'air',
+                        'security' => 'keamanan',
+                        '24_hour' => '24-jam',
+                    ];
+                    return $slugToKey[$f->slug] ?? $f->slug;
+                })->values()->all()
+            ) : '[]' !!},
             rules: []
+        },
+
+        init() {
+            @if(isset($kos))
+                let existingImages = [];
+                @foreach($kos->photos->sortBy('order') as $photo)
+                    @php
+                        $path = trim((string) $photo->url);
+                        if (preg_match('/^(https?:|data:)/i', $path)) {
+                            $previewUrl = $path;
+                        } elseif (str_starts_with($path, '/')) {
+                            $previewUrl = $path;
+                        } else {
+                            $previewUrl = asset('storage/' . ltrim($path, '/'));
+                        }
+                    @endphp
+                    existingImages.push({
+                        file: null,
+                        name: {!! json_encode($photo->id) !!},
+                        preview: {!! json_encode($previewUrl) !!},
+                        isCover: {{ $photo->is_primary ? 'true' : 'false' }},
+                    });
+                @endforeach
+                this.form.images = existingImages;
+            @endif
         },
 
         // Daftar fasilitas super lengkap + ikon kreatif
@@ -503,6 +557,7 @@ function kosFormData() {
             { id: 'listrik', label: 'Listrik Token', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />' },
             { id: 'air', label: 'Air PAM + Galon', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2" />' },
             { id: 'keamanan', label: 'Penjaga 24 Jam', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 8.944 11.922a12.02 12.02 0 00.944.078 11.955 11.955 0 01-8.944-3.04" />' },
+            { id: '24-jam', label: 'Akses 24 Jam', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />' },
         ],
 
         rulesList: [
@@ -571,12 +626,15 @@ function kosFormData() {
         },
 
         // === FASILITAS & RULES ===
+        get topFacilities() {
+            return this.form.facilities.slice(0, 5);
+        },
+
         toggleFacility(id) {
-            const idx = this.form.facilities.indexOf(id);
-            if (idx > -1) {
-                this.form.facilities.splice(idx, 1);
+            if (this.form.facilities.includes(id)) {
+                this.form.facilities = this.form.facilities.filter(fid => fid !== id);
             } else {
-                this.form.facilities.push(id);
+                this.form.facilities = [...this.form.facilities, id];
             }
         },
 
@@ -597,9 +655,11 @@ function kosFormData() {
             
             // Auto tambah beberapa fasilitas bagus
             const autoAdd = ['wifi', 'keamanan', 'parkir'];
+            let newFacilities = [...this.form.facilities];
             autoAdd.forEach(f => {
-                if (!this.form.facilities.includes(f)) this.form.facilities.push(f);
+                if (!newFacilities.includes(f)) newFacilities.push(f);
             });
+            this.form.facilities = newFacilities;
         },
 
         // === SUBMIT ===

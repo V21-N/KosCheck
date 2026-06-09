@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -47,21 +47,16 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                 <span>Moderasi Review</span>
             </a>
-            <a href="{{ route('admin.iklan') }}" class="owner-nav-item {{ request()->routeIs('admin.iklan') ? 'active' : '' }}">
+            <a href="#" class="owner-nav-item opacity-60 cursor-not-allowed" onclick="event.preventDefault();">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5 6 9H3v6h3l5 4V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9.5a4.5 4.5 0 0 1 0 5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.5 7a8 8 0 0 1 0 10"/></svg>
-                <span>Iklan Lokal</span>
+                <div class="flex-1 flex justify-between items-center">
+                    <span>Iklan Lokal</span>
+                    <span class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-md bg-gray-200 text-gray-500 uppercase tracking-wider">Coming Soon</span>
+                </div>
             </a>
             <a href="{{ route('admin.users') }}" class="owner-nav-item {{ request()->routeIs('admin.users') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20a5 5 0 0 0-10 0"/><circle cx="12" cy="8" r="4" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 20a4 4 0 0 0-3-3.87M18 4.13a4 4 0 0 1 0 7.75"/></svg>
                 <span>Manajemen User</span>
-            </a>
-            <a href="{{ route('admin.reports') }}" class="owner-nav-item {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                <span>Laporan Masuk</span>
-            </a>
-            <a href="{{ route('home') }}" class="owner-nav-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 10.5 9-7.5 9 7.5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.25 9.75V20a.75.75 0 0 0 .75.75h12a.75.75 0 0 0 .75-.75V9.75"/></svg>
-                <span>Kembali ke Beranda</span>
             </a>
         </nav>
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-border-light bg-bg">
@@ -136,17 +131,16 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                 <span>Moderasi Review</span>
             </a>
-            <a href="{{ route('admin.iklan') }}" class="owner-nav-item {{ request()->routeIs('admin.iklan') ? 'active' : '' }}">
+            <a href="#" class="owner-nav-item opacity-60 cursor-not-allowed" onclick="event.preventDefault();">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5 6 9H3v6h3l5 4V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9.5a4.5 4.5 0 0 1 0 5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.5 7a8 8 0 0 1 0 10"/></svg>
-                <span>Iklan Lokal</span>
+                <div class="flex-1 flex justify-between items-center">
+                    <span>Iklan Lokal</span>
+                    <span class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-md bg-gray-200 text-gray-500 uppercase tracking-wider">Coming Soon</span>
+                </div>
             </a>
             <a href="{{ route('admin.users') }}" class="owner-nav-item {{ request()->routeIs('admin.users') ? 'active' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20a5 5 0 0 0-10 0"/><circle cx="12" cy="8" r="4" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 20a4 4 0 0 0-3-3.87M18 4.13a4 4 0 0 1 0 7.75"/></svg>
                 <span>Manajemen User</span>
-            </a>
-            <a href="{{ route('home') }}" class="owner-nav-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 10.5 9-7.5 9 7.5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.25 9.75V20a.75.75 0 0 0 .75.75h12a.75.75 0 0 0 .75-.75V9.75"/></svg>
-                <span>Kembali ke Beranda</span>
             </a>
             <hr class="my-2 border-border">
             <form action="{{ route('logout') }}" method="POST" class="inline">

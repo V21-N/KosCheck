@@ -107,7 +107,7 @@
 
     <div class="lg:col-span-1">
         <h2 class="text-lg font-bold text-text mb-4">Ringkasan Cepat</h2>
-        <div class="card p-6 bg-primary text-white border-none shadow-md h-full flex flex-col justify-between">
+        <div class="rounded-2xl p-6 bg-primary text-white border-none shadow-md h-full flex flex-col justify-between" style="background-color: var(--color-primary, #F47C20);">
             <ul class="space-y-4">
                 <li class="flex items-start gap-3">
                     <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
@@ -130,17 +130,21 @@
 <div>
     <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
         <h2 class="text-lg font-bold text-text">Properti Terbaru</h2>
-        <a href="{{ route('dashboard.kos.create') }}" class="btn btn-primary-dark btn-sm text-xs font-semibold px-4 flex items-center gap-1 bg-[#8B4513] hover:bg-[#6b350f] border-none shadow-md" data-hover="lift">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Tambah Properti
-        </a>
     </div>
 
+    @php
+        $resolveImage = function (?string $path): string {
+            $path = trim((string) $path);
+            if ($path === '') return asset('images/hero-illustration.png');
+            if (preg_match('/^(https?:|data:)/i', $path)) return $path;
+            if (str_starts_with($path, '/')) return $path;
+            return asset('storage/' . ltrim($path, '/'));
+        };
+    @endphp
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-animate-container">
         @forelse($kosWithStats as $kos)
             @php
-                $photo = $kos->photos->first();
-                $photoUrl = $photo?->url ? asset('storage/' . ltrim($photo->url, '/')) : asset('images/kos-bedroom.png');
+                $photoUrl = $resolveImage($kos->photos->first()?->url ?? null);
                 $rating = $kos->avg_rating !== null ? number_format((float) $kos->avg_rating, 1) : '-';
                 $price = number_format((int) $kos->price, 0, ',', '.');
                 $statusClass = $kos->status === 'active'
@@ -173,8 +177,8 @@
                         <a href="{{ route('dashboard.kos.edit', $kos) }}" class="text-xs font-semibold text-green-600 hover:text-green-700">Edit</a>
                     </div>
                     <div class="flex gap-3 mt-4">
-                        <a href="{{ route('kos.show', ['slug' => $kos->slug]) }}" class="btn btn-white text-primary border-primary flex-1 text-xs py-2 hover:bg-orange-50 font-bold">Lihat Detail</a>
-                        <a href="{{ route('dashboard.booking', ['search' => $kos->name]) }}" class="btn btn-white flex-1 text-xs py-2 border-gray-200 hover:bg-gray-50 font-bold">Booking</a>
+                        <a href="{{ route('dashboard.kos.show', ['slug' => $kos->slug]) }}" class="btn btn-white text-primary border-primary flex-1 text-xs py-2 hover:bg-orange-50 font-bold">Lihat Detail</a>
+                        <a href="{{ route('dashboard.booking', ['search' => $kos->name]) }}" class="btn btn-white flex-1 text-xs py-2 border-gray-200 hover:bg-gray-50 font-bold">Cek Booking</a>
                     </div>
                 </div>
             </div>

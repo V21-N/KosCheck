@@ -95,7 +95,7 @@
                                 <label class="block text-sm font-semibold text-text mb-2">Nomor WhatsApp</label>
                                 <div class="flex">
                                     <span class="inline-flex items-center rounded-l-lg border border-r-0 border-border bg-gray-50 px-3 text-sm text-text-muted">+62</span>
-                                    <input type="tel" name="phone" value="{{ old('phone') }}" class="input-field rounded-l-none bg-gray-50 focus:bg-white @error('phone') border-red-500 @enderror" placeholder="81234567890">
+                                    <input type="tel" name="phone" value="{{ old('phone') }}" class="input-field rounded-l-none bg-gray-50 focus:bg-white @error('phone') border-red-500 @enderror" placeholder="081234567890">
                                 </div>
                                 @error('phone')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

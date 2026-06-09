@@ -4,9 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-// PAKSA NYALAKAN DEBUG DI VERCEL
-putenv('APP_DEBUG=true');
-putenv('APP_ENV=local');
+// Setting APP_ENV and APP_DEBUG here causes Laravel to read .env.local instead of .env
+// Please set APP_DEBUG=true and APP_ENV=local in your Vercel Dashboard Environment Variables instead.
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(

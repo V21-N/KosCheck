@@ -127,7 +127,7 @@
                                 @endif
                             </td>
                             <td class="p-4">
-                                <a href="{{ route('kos.show', ['slug' => $booking['kos_slug']]) }}" class="text-primary font-semibold text-sm hover:underline">Lihat Detail Kos</a>
+                                <a href="{{ route('dashboard.kos.show', ['slug' => $booking['kos_slug']]) }}" class="text-primary font-semibold text-sm hover:underline">Lihat Detail Kos</a>
                                 <p class="text-xs text-text-muted mt-1">Dibuat {{ $booking['created_at'] }}</p>
                             </td>
                             <td class="p-4 pr-6">

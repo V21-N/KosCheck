@@ -368,7 +368,20 @@ class DashboardController extends Controller
 
         $validated = $request->validated();
 
+        $validated['facilities'] = $this->resolveFacilityIds($request->input('facilities') ?? [])
+            ->filter()
+            ->values()
+            ->all();
+
         $this->kosService->updateKos($kos, $validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Perubahan berhasil disimpan!',
+                'redirect' => route('dashboard.properti'),
+            ]);
+        }
 
         return redirect()
             ->back()
@@ -445,7 +458,15 @@ class DashboardController extends Controller
 
         $bookings = $query->get();
 
-        $bookingData = $bookings->map(function (Booking $booking) {
+        $resolveImage = function (?string $path): string {
+            $path = trim((string) $path);
+            if ($path === '') return asset('images/hero-illustration.png');
+            if (preg_match('/^(https?:|data:)/i', $path)) return $path;
+            if (str_starts_with($path, '/')) return $path;
+            return asset('storage/' . ltrim($path, '/'));
+        };
+
+        $bookingData = $bookings->map(function (Booking $booking) use ($resolveImage) {
             $kos = $booking->kos;
             $photo = $kos?->photos->first();
             $mahasiswa = $booking->mahasiswa;
@@ -459,7 +480,7 @@ class DashboardController extends Controller
                     : 'https://ui-avatars.com/api/?name=' . urlencode($mahasiswa?->name ?? 'Mahasiswa') . '&background=3B82F6&color=fff&size=96',
                 'kos' => $kos?->name ?? '-',
                 'kos_slug' => $kos?->slug,
-                'kos_photo' => $photo?->url ? asset('storage/' . ltrim($photo->url, '/')) : asset('images/kos-placeholder.png'),
+                'kos_photo' => $resolveImage($photo?->url ?? null),
                 'tanggal' => $booking->move_in_date?->format('d M Y') ?? '-',
                 'durasi' => $booking->duration_months ? $booking->duration_months . ' bulan' : '-',
                 'status' => $booking->status,

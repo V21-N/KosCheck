@@ -9,9 +9,9 @@
 <section class="bg-bg py-8 md:py-10" data-reveal>
     <div class="container-custom">
         <div class="breadcrumb mb-6" data-reveal>
-            <a href="{{ route('kos.index') }}">Cari Kos</a>
+            <a href="{{ route('student.kos') }}">Cari Kos</a>
             <span>&rsaquo;</span>
-            <a href="{{ route('kos.show', ['slug' => 'kos-skyline-student']) }}">Kos Melati Residence</a>
+            <a href="{{ route('student.kos.show', ['slug' => $kos->slug]) }}">{{ $kos->name }}</a>
             <span>&rsaquo;</span>
             <span class="text-text font-medium">Tulis Review</span>
         </div>
@@ -19,21 +19,31 @@
         <div class="grid grid-cols-1 xl:grid-cols-[1.05fr,1.4fr] gap-6 items-start" x-data="reviewForm()">
             <aside class="space-y-6">
                 <div class="card overflow-hidden" data-hover="lift">
+                    @php
+                        $resolveImage = function (?string $path): string {
+                            $path = trim((string) $path);
+                            if ($path === '') return asset('images/hero-illustration.png');
+                            if (preg_match('/^(https?:|data:)/i', $path)) return $path;
+                            if (str_starts_with($path, '/')) return $path;
+                            return asset('storage/' . ltrim($path, '/'));
+                        };
+                        $primaryPhotoUrl = $kos->photos->first()?->url ?? null;
+                    @endphp
                     <div class="aspect-[16/10] overflow-hidden">
-                        <img data-src="{{ asset('images/kos-1.png') }}" alt="Kos Melati Residence" class="h-full w-full object-cover" loading="lazy">
+                        <img src="{{ $resolveImage($primaryPhotoUrl) }}" alt="{{ $kos->name }}" class="h-full w-full object-cover" loading="lazy">
                     </div>
                     <div class="p-5">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="badge badge-verified">Kos Terverifikasi</span>
-                            <span class="badge badge-type">Putra</span>
+                            <span class="badge badge-type">{{ ucfirst($kos->gender ?? 'campur') }}</span>
                         </div>
-                        <h2 class="text-xl font-bold text-text">Kos Melati Residence</h2>
+                        <h2 class="text-xl font-bold text-text">{{ $kos->name }}</h2>
                         <p class="mt-2 text-sm text-text-muted leading-relaxed">Tuliskan pengalaman tinggal yang jujur, spesifik, dan membantu mahasiswa lain membuat keputusan.</p>
 
                         <div class="mt-5 space-y-3 text-sm text-text-muted">
                             <div class="flex items-start gap-3">
                                 <svg class="w-4 h-4 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                <span>Depok, dekat UI dan area kuliner mahasiswa.</span>
+                                <span>{{ $kos->address ?? 'Lokasi kos tidak tersedia' }}</span>
                             </div>
                             <div class="flex items-start gap-3">
                                 <svg class="w-4 h-4 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -70,11 +80,17 @@
                     </div>
                 </div>
 
-                <form class="space-y-8" data-validate>
+                <form class="space-y-8" action="{{ route('student.kos.review.store', ['id' => $kos->id]) }}" method="POST" data-validate>
+                    @csrf
+                    <!-- Alpine.js bindings mapped to hidden inputs for form submission -->
+                    <input type="hidden" name="rating" :value="Math.round((ratings.kebersihan + ratings.keamanan + ratings.fasilitas + ratings.respons) / 4)">
+                    <input type="hidden" name="rating_cleanliness" :value="ratings.kebersihan">
+                    <input type="hidden" name="rating_security" :value="ratings.keamanan">
+                    <input type="hidden" name="rating_facilities" :value="ratings.fasilitas">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-sm font-semibold text-text mb-2">Nama Peninjau</label>
-                            <input type="text" class="input-field bg-gray-50 focus:bg-white" value="Budi Santoso">
+                            <input type="text" class="input-field bg-gray-50 focus:bg-white" value="{{ auth()->user()->name }}" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-text mb-2">Status Hunian</label>
@@ -134,7 +150,7 @@
                             <label class="block text-sm font-semibold text-text">Cerita Pengalaman</label>
                             <span class="text-xs text-text-muted" x-text="reviewLength + ' / 300 karakter'"></span>
                         </div>
-                        <textarea x-model="reviewText" rows="6" maxlength="300" class="input-field bg-gray-50 focus:bg-white" placeholder="Ceritakan pengalaman Anda dengan jujur. Minimal 30 karakter agar ulasan lebih berguna."></textarea>
+                        <textarea name="comment" x-model="reviewText" rows="6" maxlength="1000" class="input-field bg-gray-50 focus:bg-white" placeholder="Ceritakan pengalaman Anda dengan jujur. Minimal 30 karakter agar ulasan lebih berguna." required></textarea>
                         <p class="mt-2 text-xs" :class="reviewLength < 30 ? 'text-red-500' : 'text-green-600'">
                             <span x-show="reviewLength < 30">Tambahkan detail lagi agar ulasan memenuhi batas minimum.</span>
                             <span x-show="reviewLength >= 30" x-cloak>Ulasan sudah cukup panjang untuk dipublikasikan.</span>
@@ -160,7 +176,7 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
-                        <a href="{{ route('kos.show', ['slug' => 'kos-skyline-student']) }}" class="btn btn-white">Kembali ke Detail</a>
+                        <a href="{{ route('student.kos.show', ['slug' => $kos->slug]) }}" class="btn btn-white">Kembali ke Detail</a>
                         <button type="submit" class="btn btn-primary" data-hover="lift">Kirim Review</button>
                     </div>
                 </form>

@@ -13,18 +13,18 @@
                 <p class="mt-4 text-text-muted text-base md:text-lg leading-relaxed max-w-md" data-reveal>
                     Cari kos terdekat, lihat review mahasiswa, dan hubungi pemilik langsung melalui WhatsApp.
                 </p>
-                <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <form action="{{ route('kos.index') }}" method="GET" class="mt-6 flex flex-col sm:flex-row gap-3">
                     <div class="input-with-icon flex-1">
                         <span class="input-icon">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </span>
-                        <input type="text" placeholder="Cari lokasi atau nama kos..." class="input-field" id="hero-search">
+                        <input type="text" name="search" placeholder="Cari lokasi atau nama kos..." class="input-field" id="hero-search">
                     </div>
-                    <a href="{{ route('kos.index') }}" class="btn btn-primary btn-lg" id="hero-cari-btn" data-hover="lift" style="background-color: #EA580C; border-color: #EA580C;">
+                    <button type="submit" class="btn btn-primary btn-lg" id="hero-cari-btn" data-hover="lift" style="background-color: #EA580C; border-color: #EA580C;">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         Cari Kos
-                    </a>
-                </div>
+                    </button>
+                </form>
             </div>
             <div class="hidden md:flex justify-center">
                 <img src="{{ asset('images/hero-illustration.png') }}" alt="Ilustrasi pencarian kos" class="max-w-sm lg:max-w-md w-full rounded-2xl" loading="lazy">
@@ -79,11 +79,18 @@
                 <div class="relative overflow-hidden aspect-[4/3]">
                     @php
                         $primaryPhoto = $kos->photos->first();
-                        $imageSrc = $primaryPhoto
-                            ? asset('storage/' . $primaryPhoto->url)
-                            : asset('images/kos-placeholder.png');
+                        if ($primaryPhoto) {
+                            $path = trim((string) $primaryPhoto->url);
+                            if (preg_match('/^(https?:|data:)/i', $path) || str_starts_with($path, '/')) {
+                                $imageSrc = $path;
+                            } else {
+                                $imageSrc = asset('storage/' . ltrim($path, '/'));
+                            }
+                        } else {
+                            $imageSrc = asset('images/hero-illustration.png');
+                        }
                     @endphp
-                    <img data-src="{{ $imageSrc }}" alt="{{ $kos->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                    <img src="{{ $imageSrc }}" alt="{{ $kos->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                     @if($kos->is_active && $kos->status === 'active')
                     <span class="absolute top-3 left-3 badge badge-verified text-[0.65rem]">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -169,49 +176,6 @@
                     </div>
                 </div>
                 @endforeach
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ═══════ LAYANAN SEKITAR KOS ═══════ --}}
-<section class="section bg-white" data-reveal>
-    <div class="container-custom">
-        <h2 class="section-title mb-6" data-reveal>Layanan Sekitar Kos</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {{-- Card 1: Isi Ulang Air Galon --}}
-            <div class="bg-[#E0F2F1] rounded-2xl p-8 flex flex-col items-center justify-center text-center" data-hover="lift">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
-                    <svg class="w-8 h-8 text-[#0f766e]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                </div>
-                <h3 class="font-bold text-lg text-gray-800">Isi Ulang Air Galon</h3>
-                <p class="text-sm text-gray-500 mt-2 max-w-xs">Layanan antar jemput galon terpercaya area kampus dan sekitarnya.</p>
-                <a href="{{ route('layanan-galon') }}" class="mt-6 inline-block bg-[#0f766e] hover:bg-[#0d5e57] text-white px-6 py-2 rounded-lg text-xs font-semibold transition" data-hover="lift">Pesan Sekarang</a>
-            </div>
-
-            {{-- Card 2: Butuh Air Galon untuk Kos? --}}
-            <div class="bg-white border border-gray-200 rounded-2xl p-8 flex flex-col" data-hover="lift">
-                <h3 class="font-bold text-lg text-gray-800">Butuh Air Galon untuk Kos?</h3>
-                <p class="text-sm text-gray-500 mt-2">Pesan isi ulang air galon yang aman dan terjangkau, diantar langsung ke kos kamu.</p>
-                <div class="flex-1 flex items-center justify-center my-4">
-                    <div class="relative w-24 h-24">
-                        <img src="{{ asset('images/galon.png') }}" alt="Galon Air" class="w-full h-full object-contain">
-                    </div>
-                </div>
-                <div class="flex flex-col items-center mb-4">
-                    <div class="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
-                        <span class="font-bold text-sm text-gray-700">GalonKu</span>
-                        <span class="text-[10px] text-green-600 font-semibold">● Terverifikasi</span>
-                    </div>
-                    <div class="mt-1 text-center">
-                        <span class="text-lg font-bold text-green-700">Rp 5.000</span>
-                        <span class="text-xs text-gray-500">/ galon</span>
-                    </div>
-                </div>
-                <a href="#" class="w-full mt-auto inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-xs font-semibold transition" data-hover="lift">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-                    Pesan via WhatsApp
-                </a>
             </div>
         </div>
     </div>

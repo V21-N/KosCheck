@@ -11,7 +11,7 @@
     @include('components.mobile-review')
 
     <div class="container-custom max-w-5xl">
-        
+
         {{-- Top Section: Profile Info --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 scroll-animate-container">
 
@@ -46,7 +46,7 @@
                     </div>
                     <div class="flex items-center justify-center sm:justify-start gap-3 mt-6">
                         <button @click="openEditModal()" class="btn btn-primary-outline btn-sm px-6" data-hover="lift">Edit Profil</button>
-                        <button onclick="event.preventDefault(); localStorage.removeItem('kc_role'); window.location.href='{{ route('logout.get') }}'" 
+                        <button onclick="event.preventDefault(); localStorage.removeItem('kc_role'); window.location.href='{{ route('logout.get') }}'"
                                 class="text-sm font-semibold text-red-500 hover:text-red-600 flex items-center gap-1 transition-colors px-4 py-2" data-hover="lift">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                             Keluar
@@ -90,26 +90,43 @@
                 <h2 class="text-xl font-bold text-text">Riwayat Booking</h2>
                 <a href="/mahasiswa/booking" class="text-xs font-semibold text-green-600 hover:text-green-700">Lihat Semua</a>
             </div>
-            
-            <div class="card p-3 border border-border flex flex-col sm:flex-row items-center gap-4 hover:border-primary/40 transition-colors shadow-sm bg-white" data-hover="lift" data-reveal>
+
+            @if($recentBookings->isEmpty())
+            {{-- Empty State: No Bookings --}}
+            <div class="card p-6 border border-dashed border-border-light bg-transparent text-center">
+                <div class="w-16 h-16 rounded-full bg-orange-100 text-primary flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <h3 class="font-bold text-base mb-2">Belum Ada Riwayat Booking</h3>
+                <p class="text-sm text-text-muted mb-4">Kamu belum pernah melakukan booking kos. Mulai cari kos impianmu sekarang!</p>
+                <a href="{{ route('student.kos') }}" class="btn btn-primary btn-sm px-6">Cari Kos</a>
+            </div>
+            @else
+            {{-- Booking List --}}
+            @foreach($recentBookings as $booking)
+            <div class="card p-3 border border-border flex flex-col sm:flex-row items-center gap-4 hover:border-primary/40 transition-colors shadow-sm bg-white mb-3" data-hover="lift" data-reveal>
                 <div class="w-full sm:w-40 h-28 rounded-lg overflow-hidden flex-shrink-0 relative">
-                    <img src="{{ asset('images/kos-bedroom.png') }}" class="w-full h-full object-cover">
+                    <img src="{{ $booking->kos?->photos->first()?->url ? (str_starts_with($booking->kos->photos->first()->url, 'http') ? $booking->kos->photos->first()->url : asset('storage/' . $booking->kos->photos->first()->url)) : asset('images/hero-illustration.png') }}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1 w-full py-1 pr-2">
                     <div class="flex justify-between items-start mb-1">
-                        <h3 class="font-bold text-base text-text">Kos Skyline Student</h3>
-                        <span class="badge bg-green-400 text-white text-[0.65rem] px-2.5 py-0.5 rounded-full shadow-sm shadow-green-200">Aktif</span>
+                        <h3 class="font-bold text-base text-text">{{ $booking->kos?->name ?? 'Kos tidak ditemukan' }}</h3>
+                        <span class="badge {{ $booking->status === 'approved' ? 'bg-green-400 text-white' : ($booking->status === 'rejected' ? 'bg-red-400 text-white' : 'bg-orange-400 text-white') }} text-[0.65rem] px-2.5 py-0.5 rounded-full shadow-sm">
+                            {{ $booking->status === 'approved' ? 'Aktif' : ($booking->status === 'rejected' ? 'Ditolak' : 'Menunggu') }}
+                        </span>
                     </div>
                     <div class="flex items-center gap-1 text-text-muted text-xs mb-4">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                        Beji, Depok
+                        {{ $booking->kos?->address ?? '-' }}
                     </div>
                     <div class="flex items-center justify-between border-t border-border-light pt-3 mt-auto">
-                        <p class="text-xs text-text-muted">Booking: <span class="font-bold text-text">12 Okt 2025</span></p>
+                        <p class="text-xs text-text-muted">Booking: <span class="font-bold text-text">{{ $booking->created_at->format('d M Y') }}</span></p>
                         <a href="/mahasiswa/booking" class="text-xs font-semibold text-primary flex items-center gap-1 hover:text-primary-dark transition-colors">Lihat Detail <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
                     </div>
                 </div>
             </div>
+            @endforeach
+            @endif
         </div>
 
         {{-- Kos Favorit --}}
@@ -118,50 +135,50 @@
                 <h2 class="text-xl font-bold text-text">Kos Favorit</h2>
                 <a href="/kos" class="text-xs font-semibold text-green-600 hover:text-green-700">Kelola Favorit</a>
             </div>
-            
+
+            @if($favoriteKos->isEmpty())
+            {{-- Empty State: No Favorites --}}
+            <div class="card border-2 border-dashed border-border-light bg-transparent hover:bg-white hover:border-primary/40 transition-colors flex flex-col items-center justify-center p-8 text-center" data-hover="lift" data-reveal>
+                <div class="w-14 h-14 rounded-full bg-orange-100 text-primary flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                </div>
+                <h3 class="font-bold text-base mb-2">Belum Ada Kos Favorit</h3>
+                <p class="text-sm text-text-muted mb-5">Simpan kos favoritmu di sini untuk memudahkan pencarian di kemudian hari.</p>
+                <a href="{{ route('kos.index') }}" class="btn btn-primary btn-sm px-6">Explore Kos</a>
+            </div>
+            @else
+            {{-- Favorites Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                @foreach($favoriteKos as $kos)
                 <div class="card group shadow-sm bg-white" data-hover="lift" data-reveal>
                     <div class="relative overflow-hidden aspect-[4/3]">
-                        <img src="{{ asset('images/kos-bedroom.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                        <img src="{{ $kos->photos->first()?->url ? (str_starts_with($kos->photos->first()->url, 'http') ? $kos->photos->first()->url : asset('storage/' . $kos->photos->first()->url)) : asset('images/hero-illustration.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                        @if($kos->status === 'active' && $kos->is_active)
                         <span class="absolute bottom-3 left-3 badge badge-verified text-[0.65rem] bg-green-700 text-white border border-green-800">
                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                             Terverifikasi
                         </span>
-                        <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-red-500 shadow-md">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                        </button>
+                        @endif
+                        <form action="{{ route('mahasiswa.favorite.remove', $kos) }}" method="POST" class="absolute top-3 right-3">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-red-500 shadow-md hover:bg-red-50 transition-colors" title="Hapus dari favorit">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                            </button>
+                        </form>
                     </div>
                     <div class="p-4">
-                        <h3 class="font-bold text-sm">Kos Ceria Putri UI</h3>
-                        <p class="text-xs text-text-muted mt-1 mb-4">Kukusan, Depok</p>
+                        <h3 class="font-bold text-sm">{{ $kos->name }}</h3>
+                        <p class="text-xs text-text-muted mt-1 mb-4">{{ $kos->address }}</p>
                         <div class="flex items-end justify-between">
-                            <p class="font-extrabold text-primary text-base">Rp 1.800.000<span class="text-[0.65rem] font-normal text-text-muted">/bln</span></p>
-                            <a href="/kos" class="text-xs font-semibold text-green-600">Detail</a>
+                            <p class="font-extrabold text-primary text-base">Rp {{ number_format($kos->price, 0, ',', '.') }}<span class="text-[0.65rem] font-normal text-text-muted">/bln</span></p>
+                            <a href="{{ route('kos.show', $kos->slug) }}" class="text-xs font-semibold text-green-600">Detail</a>
                         </div>
                     </div>
                 </div>
+                @endforeach
 
-                <div class="card group shadow-sm bg-white" data-hover="lift" data-reveal>
-                    <div class="relative overflow-hidden aspect-[4/3]">
-                        <img src="{{ asset('images/kos-kitchen.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
-                        <span class="absolute bottom-3 left-3 badge badge-verified text-[0.65rem] bg-green-700 text-white border border-green-800">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                            Terverifikasi
-                        </span>
-                        <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-red-500 shadow-md">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                        </button>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="font-bold text-sm">Griya Studio Premium</h3>
-                        <p class="text-xs text-text-muted mt-1 mb-4">Margonda, Depok</p>
-                        <div class="flex items-end justify-between">
-                            <p class="font-extrabold text-primary text-base">Rp 2.500.000<span class="text-[0.65rem] font-normal text-text-muted">/bln</span></p>
-                            <a href="/kos" class="text-xs font-semibold text-green-600">Detail</a>
-                        </div>
-                    </div>
-                </div>
-
+                {{-- Add More CTA --}}
                 <div class="card border-2 border-dashed border-border-light bg-transparent hover:bg-white hover:border-primary/40 transition-colors flex flex-col items-center justify-center p-6 text-center min-h-[260px] shadow-none" data-hover="lift" data-reveal>
                     <div class="w-12 h-12 rounded-full bg-orange-100 text-primary flex items-center justify-center mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -171,6 +188,7 @@
                     <a href="{{ route('kos.index') }}" class="btn btn-primary btn-sm px-6" data-hover="lift">Explore Sekarang</a>
                 </div>
             </div>
+            @endif
         </div>
 
     </div>
