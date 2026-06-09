@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 6.0.0-dev+20260526.9a43c2e222
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 01, 2026 at 08:25 AM
+-- Generation Time: Jun 09, 2026 at 06:37 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.5.5
 
@@ -30,11 +30,11 @@ SET time_zone = "+00:00";
 CREATE TABLE `ads` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `image_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `target_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `position` enum('homepage','search_result','kos_detail','sidebar') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `area` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `target_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `position` enum('homepage','search_result','kos_detail','sidebar') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `area` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
@@ -65,11 +65,11 @@ CREATE TABLE `bookings` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `kos_id` bigint UNSIGNED NOT NULL,
-  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `rejection_reason` text COLLATE utf8mb4_unicode_ci,
-  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `university` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gender` enum('L','P') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('pending','approved','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `rejection_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `university` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gender` enum('L','P') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `move_in_date` date DEFAULT NULL,
   `duration_months` tinyint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -82,7 +82,8 @@ CREATE TABLE `bookings` (
 
 INSERT INTO `bookings` (`id`, `user_id`, `kos_id`, `status`, `rejection_reason`, `phone`, `university`, `gender`, `move_in_date`, `duration_months`, `created_at`, `updated_at`) VALUES
 (1, 7, 1, 'pending', NULL, NULL, NULL, NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(2, 8, 1, 'rejected', 'Maaf, kamar sudah terisi. Silakan pilih kos lain.', NULL, NULL, NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50');
+(2, 8, 1, 'rejected', 'Maaf, kamar sudah terisi. Silakan pilih kos lain.', NULL, NULL, NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(4, 10, 11, 'pending', NULL, '081376448988', 'Universitas Islam Negeri Sumatera Utara', 'L', '2026-06-09', 6, '2026-06-09 06:26:05', '2026-06-09 06:26:05');
 
 -- --------------------------------------------------------
 
@@ -91,8 +92,8 @@ INSERT INTO `bookings` (`id`, `user_id`, `kos_id`, `status`, `rejection_reason`,
 --
 
 CREATE TABLE `cache` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -103,8 +104,8 @@ CREATE TABLE `cache` (
 --
 
 CREATE TABLE `cache_locks` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -116,9 +117,9 @@ CREATE TABLE `cache_locks` (
 
 CREATE TABLE `facilities` (
   `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -155,13 +156,34 @@ INSERT INTO `facilities` (`id`, `name`, `icon`, `slug`, `created_at`, `updated_a
 
 CREATE TABLE `failed_jobs` (
   `id` bigint UNSIGNED NOT NULL,
-  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `favorite_kos`
+--
+
+CREATE TABLE `favorite_kos` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `kos_id` bigint UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `favorite_kos`
+--
+
+INSERT INTO `favorite_kos` (`id`, `user_id`, `kos_id`, `created_at`, `updated_at`) VALUES
+(2, 10, 2, '2026-06-09 07:02:44', '2026-06-09 07:02:44');
 
 -- --------------------------------------------------------
 
@@ -171,8 +193,8 @@ CREATE TABLE `failed_jobs` (
 
 CREATE TABLE `jobs` (
   `id` bigint UNSIGNED NOT NULL,
-  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `attempts` tinyint UNSIGNED NOT NULL,
   `reserved_at` int UNSIGNED DEFAULT NULL,
   `available_at` int UNSIGNED NOT NULL,
@@ -186,13 +208,13 @@ CREATE TABLE `jobs` (
 --
 
 CREATE TABLE `job_batches` (
-  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_jobs` int NOT NULL,
   `pending_jobs` int NOT NULL,
   `failed_jobs` int NOT NULL,
-  `failed_job_ids` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `options` mediumtext COLLATE utf8mb4_unicode_ci,
+  `failed_job_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `cancelled_at` int DEFAULT NULL,
   `created_at` int NOT NULL,
   `finished_at` int DEFAULT NULL
@@ -207,17 +229,17 @@ CREATE TABLE `job_batches` (
 CREATE TABLE `kos` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `address` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
   `price` int NOT NULL,
-  `gender` enum('putra','putri','campur') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'campur',
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `whatsapp` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('pending','active','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `gender` enum('putra','putri','campur') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'campur',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `whatsapp` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('pending','active','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `is_premium` tinyint(1) NOT NULL DEFAULT '0',
   `premium_expires_at` timestamp NULL DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
@@ -231,16 +253,18 @@ CREATE TABLE `kos` (
 --
 
 INSERT INTO `kos` (`id`, `user_id`, `name`, `slug`, `address`, `latitude`, `longitude`, `price`, `gender`, `description`, `whatsapp`, `phone`, `status`, `is_premium`, `premium_expires_at`, `is_active`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 2, 'Kos Melati Indah', 'kos-melati-indah', 'Jl. Merdeka No. 15, Medan', 3.59520000, 98.67220000, 800000, 'putri', 'Kos nyaman dengan suasana tenang, cocok untuk mahasiswa. Lokasi strategis dekat kampus USU dan UNIMED. Akses jalan mudah, lingkungan aman dengan keamanan 24 jam.', '6281234567890', NULL, 'active', 1, '2026-08-29 20:50:49', 1, NULL, '2026-05-29 20:50:49', '2026-05-29 20:50:49'),
-(2, 3, 'Kos Anggrek Residence', 'kos-anggrek-residence', 'Jl. Sudirman No. 42, Medan', 3.58940000, 98.67310000, 650000, 'putra', 'Kos putra minimalis dengan fasilitas lengkap. Dilengkapi AC, WiFi, dan kamar mandi dalam. Lokasi strategis di pusat kota Medan.', '6281234567891', NULL, 'active', 1, '2026-07-29 20:50:49', 1, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(1, 2, 'Kos Melati Indah', 'kos-melati-indah', 'Jl. Merdeka No. 15, Medan', 3.59520000, 98.67220000, 800000, 'campur', 'Kos nyaman dengan suasana tenang, cocok untuk mahasiswa. Lokasi strategis dekat kampus USU dan UNIMED. Akses jalan mudah, lingkungan aman dengan keamanan 24 jam.', '081234567890', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:49', '2026-06-09 11:28:53'),
+(2, 3, 'Kos Anggrek Residence', 'kos-anggrek-residence', 'Jl. Sudirman No. 42, Medan', 3.58940000, 98.67310000, 650000, 'putra', 'Kos putra minimalis dengan fasilitas lengkap. Dilengkapi AC, WiFi, dan kamar mandi dalam. Lokasi strategis di pusat kota Medan.', '6281234567891', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:50', '2026-06-09 11:28:44'),
 (3, 4, 'Kos Cemara Asri', 'kos-cemara-asri', 'Jl. Pancing No. 8, Medan', 3.59850000, 98.68120000, 550000, 'campur', 'Kos campur dengan harga terjangkau. Fasilitas dasar tersedia: WiFi, parkir, dan dapur bersama. Lingkungan asri dan nyaman.', '6281234567892', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(4, 5, 'Kos Kenanga Family', 'kos-kenanga-family', 'Jl. Ahmad Yani No. 25, Medan', 3.58760000, 98.66980000, 1200000, 'putri', 'Kos premium untuk mahasiswa dengan standar hotel. Fasilitas lengkap termasuk AC, WiFi, TV, dan laundry. Keamanan terjamin dengan CCTV.', '6281234567893', NULL, 'active', 1, '2026-09-29 20:50:49', 1, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(4, 5, 'Kos Kenanga Family', 'kos-kenanga-family', 'Jl. Ahmad Yani No. 25, Medan', 3.58760000, 98.66980000, 1200000, 'putri', 'Kos premium untuk mahasiswa dengan standar hotel. Fasilitas lengkap termasuk AC, WiFi, TV, dan laundry. Keamanan terjamin dengan CCTV.', '6281234567893', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:50', '2026-06-09 11:28:47'),
 (5, 6, 'Kos Mawar Bersinar', 'kos-mawar-bersinar', 'Jl. Sisingamangaraja No. 11, Medan', 3.59120000, 98.67560000, 450000, 'putra', 'Kos putra ekonomis dekat kampus. Fasilitas: WiFi, akses 24 jam, parkir luas. Lingkungan aman dan bersih.', '6281234567894', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(6, 2, 'Kos Flamboyan Premium', 'kos-flamboyan-premium', 'Jl. HM Jhoni No. 33, Medan', 3.59410000, 98.67120000, 950000, 'campur', 'Kos premium campur dengan lokasi strategis. Dekat dengan pusat perbelanjaan dan akses transportasi umum. Fasilitas lengkap.', '6281234567895', NULL, 'active', 1, '2026-07-29 20:50:49', 1, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(7, 3, 'Kos Teratai Hijau', 'kos-teratai-hijau', 'Jl. Imam Bonjol No. 7, Medan', 3.59680000, 98.66890000, 700000, 'putri', 'Kos putri dengan nuansa asri dan tenang. Dilengkapi WiFi, AC, dan kamar mandi dalam. Keamanan 24 jam dengan akses kartu.', '6281234567896', NULL, 'active', 1, '2026-08-29 20:50:49', 1, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(6, 2, 'Kos Flamboyan Premium', 'kos-flamboyan-premium', 'Jl. HM Jhoni No. 33, Medan', 3.59410000, 98.67120000, 950000, 'campur', 'Kos premium campur dengan lokasi strategis. Dekat dengan pusat perbelanjaan dan akses transportasi umum. Fasilitas lengkap.', '6281234567895', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:50', '2026-06-09 11:28:50'),
+(7, 3, 'Kos Teratai Hijau', 'kos-teratai-hijau', 'Jl. Imam Bonjol No. 7, Medan', 3.59680000, 98.66890000, 700000, 'putri', 'Kos putri dengan nuansa asri dan tenang. Dilengkapi WiFi, AC, dan kamar mandi dalam. Keamanan 24 jam dengan akses kartu.', '6281234567896', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:50', '2026-06-09 11:29:02'),
 (8, 4, 'Kos Dahlia Residence', 'kos-dahlia-residence', 'Jl. S. Parman No. 56, Medan', 3.59230000, 98.67780000, 580000, 'putra', 'Kos putra nyaman dengan fasilitas lengkap. Lokasi sangat strategis dekat dengan rumah sakit dan universitas.', '6281234567897', NULL, 'active', 0, NULL, 1, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(9, 2, 'Kos Aselole', 'kos-aselole', 'Jl. Lapangan Golf, No.49', NULL, NULL, 1200000, 'putra', 'Kos premium khusus putra dengan suasana tenang, WiFi kencang, dan dekat kampus USU serta banyak warung makan 24 jam.', '081234567890', NULL, 'pending', 0, NULL, 0, NULL, '2026-05-31 18:51:48', '2026-05-31 18:51:48'),
-(10, 2, 'Kos Icikiwir', 'kos-icikiwir', 'Jl. Lapangan Golf, No.50', NULL, NULL, 1200000, 'putra', 'Kos premium khusus putra dengan suasana tenang, WiFi kencang, dan dekat kampus USU serta banyak warung makan 24 jam.', '081234567890', NULL, 'pending', 0, NULL, 0, NULL, '2026-05-31 20:25:42', '2026-05-31 20:25:42');
+(9, 2, 'Kos Aselole', 'kos-aselole', 'Jl. Lapangan Golf, No.49', NULL, NULL, 1200000, 'putra', 'Kos premium khusus putra dengan suasana tenang, WiFi kencang, dan dekat kampus USU serta banyak warung makan 24 jam.', '081234567890', NULL, 'active', 0, NULL, 1, NULL, '2026-05-31 18:51:48', '2026-06-01 12:14:36'),
+(10, 2, 'Kos Icikiwir', 'kos-icikiwir', 'Jl. Lapangan Golf, No.50', NULL, NULL, 1200000, 'putra', 'Kos premium khusus putra dengan suasana tenang, WiFi kencang, dan dekat kampus USU serta banyak warung makan 24 jam.', '081234567890', NULL, 'active', 0, NULL, 1, NULL, '2026-05-31 20:25:42', '2026-06-01 12:14:58'),
+(11, 2, 'Kos Jomok(erto)', 'kos-jomokerto', 'Jl. Jamin Ginting No. 1123', NULL, NULL, 1500000, 'putra', 'Kos premium khusus putra dengan suasana tenang, WiFi kencang, dan dekat kampus USU serta banyak warung makan 24 jam.', '081234567890', NULL, 'active', 0, NULL, 1, NULL, '2026-06-01 09:42:56', '2026-06-01 12:14:49'),
+(12, 2, 'Kos Digidaw', 'kos-digidaw', 'Jl. Jamin Ginting, No.112', NULL, NULL, 800000, 'putra', 'Kos premium khusus putra dengan suasana tenang, WiFi kencang, dan dekat kampus USU serta banyak warung makan 24 jam.', '081234567890', NULL, 'active', 1, '2026-07-09 11:29:34', 1, NULL, '2026-06-02 01:29:05', '2026-06-09 11:29:34');
 
 -- --------------------------------------------------------
 
@@ -268,6 +292,8 @@ INSERT INTO `kos_facilities` (`kos_id`, `facility_id`) VALUES
 (8, 1),
 (9, 1),
 (10, 1),
+(11, 1),
+(12, 1),
 (1, 2),
 (2, 2),
 (3, 2),
@@ -278,6 +304,8 @@ INSERT INTO `kos_facilities` (`kos_id`, `facility_id`) VALUES
 (8, 2),
 (9, 2),
 (10, 2),
+(11, 2),
+(12, 2),
 (1, 3),
 (2, 3),
 (3, 3),
@@ -288,7 +316,8 @@ INSERT INTO `kos_facilities` (`kos_id`, `facility_id`) VALUES
 (8, 3),
 (9, 3),
 (10, 3),
-(1, 5),
+(11, 3),
+(12, 3),
 (2, 5),
 (3, 5),
 (4, 5),
@@ -306,8 +335,12 @@ INSERT INTO `kos_facilities` (`kos_id`, `facility_id`) VALUES
 (8, 6),
 (9, 6),
 (10, 6),
+(11, 6),
+(12, 6),
 (9, 11),
-(10, 11);
+(10, 11),
+(11, 11),
+(12, 11);
 
 -- --------------------------------------------------------
 
@@ -319,8 +352,8 @@ CREATE TABLE `leads` (
   `id` bigint UNSIGNED NOT NULL,
   `kos_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `converted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -365,16 +398,16 @@ INSERT INTO `leads` (`id`, `kos_id`, `user_id`, `ip_address`, `user_agent`, `con
 CREATE TABLE `local_businesses` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `category` enum('laundry','catering','internet','moving_service','minimarket','pharmacy','other') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `whatsapp` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category` enum('laundry','catering','internet','moving_service','minimarket','pharmacy','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `whatsapp` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
-  `image_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_verified` tinyint(1) NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -400,7 +433,7 @@ INSERT INTO `local_businesses` (`id`, `user_id`, `name`, `slug`, `category`, `de
 
 CREATE TABLE `migrations` (
   `id` int UNSIGNED NOT NULL,
-  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -426,7 +459,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (15, '2024_01_01_000012_add_fields_to_reports_table', 1),
 (16, '2024_01_01_000013_create_bookings_table', 1),
 (17, '2026_05_29_040951_create_personal_access_tokens_table', 1),
-(18, '2024_06_01_000001_add_booking_profile_fields', 2);
+(18, '2024_06_01_000001_add_booking_profile_fields', 2),
+(19, '2026_06_02_000001_add_presence_columns_to_users_table', 3),
+(20, '2026_06_02_000002_add_status_to_reviews_table', 4),
+(21, '2026_06_05_000001_fix_reviews_is_visible_default', 5),
+(22, '2026_06_09_000001_create_favorite_kos_table', 5);
 
 -- --------------------------------------------------------
 
@@ -437,15 +474,28 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 CREATE TABLE `notifications` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `data` json DEFAULT NULL,
   `is_read` tinyint(1) NOT NULL DEFAULT '0',
   `read_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `data`, `is_read`, `read_at`, `created_at`, `updated_at`) VALUES
+(1, 2, 'booking', 'Booking Baru', 'Muhammad Alvin NurRahman mengajukan booking untuk Kos Icikiwir', '{\"kos_id\": 10, \"status\": \"pending\", \"kos_slug\": \"kos-icikiwir\", \"booking_id\": 3, \"mahasiswa_id\": 9, \"move_in_date\": \"2026-06-01\", \"mahasiswa_name\": \"Muhammad Alvin NurRahman\", \"duration_months\": \"6\", \"mahasiswa_phone\": \"81376448988\", \"mahasiswa_gender\": \"L\", \"mahasiswa_university\": \"Universitas Islam Negeri Sumatera Utara\"}', 1, '2026-06-01 10:44:46', '2026-06-01 09:38:03', '2026-06-01 10:44:46'),
+(3, 2, 'kos_approved', 'Kos Diterima! 🎉', 'Properti kos \'Kos Icikiwir\' telah diverifikasi dan kini bisa dilihat oleh mahasiswa.', '{\"kos_id\": 10, \"status\": \"active\", \"kos_name\": \"Kos Icikiwir\", \"kos_slug\": \"kos-icikiwir\"}', 1, '2026-06-09 08:37:39', '2026-06-01 12:03:59', '2026-06-09 08:37:39'),
+(4, 2, 'kos_approved', 'Kos Diterima! 🎉', 'Properti kos \'Kos Aselole\' telah diverifikasi dan kini bisa dilihat oleh mahasiswa.', '{\"kos_id\": 9, \"status\": \"active\", \"kos_name\": \"Kos Aselole\", \"kos_slug\": \"kos-aselole\"}', 1, '2026-06-09 08:37:39', '2026-06-01 12:14:36', '2026-06-09 08:37:39'),
+(5, 2, 'kos_approved', 'Kos Diterima! 🎉', 'Properti kos \'Kos Aselole\' telah diverifikasi dan kini bisa dilihat oleh mahasiswa.', '\"{\\\"kos_id\\\":9,\\\"kos_slug\\\":\\\"kos-aselole\\\"}\"', 1, '2026-06-09 08:37:39', '2026-06-01 12:14:45', '2026-06-09 08:37:39'),
+(6, 2, 'kos_approved', 'Kos Diterima! 🎉', 'Properti kos \'Kos Icikiwir\' telah diverifikasi dan kini bisa dilihat oleh mahasiswa.', '{\"kos_id\": 10, \"status\": \"active\", \"kos_name\": \"Kos Icikiwir\", \"kos_slug\": \"kos-icikiwir\"}', 1, '2026-06-09 08:37:39', '2026-06-01 12:14:58', '2026-06-09 08:37:39'),
+(7, 2, 'kos_approved', 'Kos Diterima! 🎉', 'Properti kos \'Kos Digidaw\' telah diverifikasi dan kini bisa dilihat oleh mahasiswa.', '{\"kos_id\": 12, \"status\": \"active\", \"kos_name\": \"Kos Digidaw\", \"kos_slug\": \"kos-digidaw\"}', 1, '2026-06-09 08:37:39', '2026-06-02 01:30:09', '2026-06-09 08:37:39'),
+(8, 2, 'booking', 'Booking Baru', 'Muhammad Alvin Nurrahman mengajukan booking untuk Kos Jomok(erto)', '{\"kos_id\": 11, \"status\": \"pending\", \"kos_slug\": \"kos-jomokerto\", \"booking_id\": 4, \"mahasiswa_id\": 10, \"move_in_date\": \"2026-06-09\", \"mahasiswa_name\": \"Muhammad Alvin Nurrahman\", \"duration_months\": \"6\", \"mahasiswa_phone\": \"081376448988\", \"mahasiswa_gender\": \"L\", \"mahasiswa_university\": \"Universitas Islam Negeri Sumatera Utara\"}', 1, '2026-06-09 08:37:39', '2026-06-09 06:26:05', '2026-06-09 08:37:39');
 
 -- --------------------------------------------------------
 
@@ -454,10 +504,17 @@ CREATE TABLE `notifications` (
 --
 
 CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `password_reset_tokens`
+--
+
+INSERT INTO `password_reset_tokens` (`email`, `token`, `created_at`) VALUES
+('vinnr21@gmail.com', '$2y$12$UC9ElgLIv0HKRy6ESv1SFemrYz60xN1vyA2rAlixhIcHWEFmFFrSe', '2026-06-02 22:44:01');
 
 -- --------------------------------------------------------
 
@@ -467,11 +524,11 @@ CREATE TABLE `password_reset_tokens` (
 
 CREATE TABLE `personal_access_tokens` (
   `id` bigint UNSIGNED NOT NULL,
-  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tokenable_id` bigint UNSIGNED NOT NULL,
-  `name` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `abilities` text COLLATE utf8mb4_unicode_ci,
+  `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -487,7 +544,7 @@ CREATE TABLE `personal_access_tokens` (
 CREATE TABLE `photos` (
   `id` bigint UNSIGNED NOT NULL,
   `kos_id` bigint UNSIGNED NOT NULL,
-  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `order` int NOT NULL DEFAULT '0',
   `is_primary` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -532,7 +589,13 @@ INSERT INTO `photos` (`id`, `kos_id`, `url`, `order`, `is_primary`, `created_at`
 (31, 10, 'kos-photos/Q6kqNKtHlihjgKpKYcJPcROfjay56g7IT8a3C1kl.png', 1, 0, '2026-05-31 20:25:42', '2026-05-31 20:25:42'),
 (32, 10, 'kos-photos/H9VQs8l0bBibUzJU5aTdvaUa0djpvj7I85Agv9gK.png', 2, 0, '2026-05-31 20:25:42', '2026-05-31 20:25:42'),
 (33, 10, 'kos-photos/xOsTahPZDSNCTolUTcNJATRwQPJinqwvBes0Qwnz.png', 3, 0, '2026-05-31 20:25:42', '2026-05-31 20:25:42'),
-(34, 10, 'kos-photos/0p50GfAZ5S9HG4dMBZEZSvJp0c8uTcd62Pnvf7FX.png', 4, 0, '2026-05-31 20:25:42', '2026-05-31 20:25:42');
+(34, 10, 'kos-photos/0p50GfAZ5S9HG4dMBZEZSvJp0c8uTcd62Pnvf7FX.png', 4, 0, '2026-05-31 20:25:42', '2026-05-31 20:25:42'),
+(35, 11, 'kos-photos/lnmQ0c14oiG5YPrAhqBEIMi0oLLxUdN3YuOzE1aX.jpg', 0, 1, '2026-06-01 09:42:57', '2026-06-01 09:42:57'),
+(36, 11, 'kos-photos/moIOW7yBPM7K9vgbfy12TOitO0uZYTTzpYcBeu4p.jpg', 1, 0, '2026-06-01 09:42:57', '2026-06-01 09:42:57'),
+(37, 11, 'kos-photos/JzLSetrY22C5ZLNcZV060Jf8APU3a2SjbnM5jXQM.jpg', 2, 0, '2026-06-01 09:42:57', '2026-06-01 09:42:57'),
+(38, 12, 'kos-photos/YLEdxLBbbY4Vva7rKsuSd88y1eCf16gA2Xh87HBU.jpg', 0, 1, '2026-06-02 01:29:05', '2026-06-02 01:29:05'),
+(39, 12, 'kos-photos/OGbnIQs08DsO6h9fIAKPs3OJ9XzJWvLYktSlTTlq.jpg', 1, 0, '2026-06-02 01:29:05', '2026-06-02 01:29:05'),
+(40, 12, 'kos-photos/Yb1ZIVi2tGLPc08uKkG8PFdznzyO2zU9S6Dxhfmq.jpg', 2, 0, '2026-06-02 01:29:05', '2026-06-02 01:29:05');
 
 -- --------------------------------------------------------
 
@@ -542,19 +605,19 @@ INSERT INTO `photos` (`id`, `kos_id`, `url`, `order`, `is_primary`, `created_at`
 
 CREATE TABLE `reports` (
   `id` bigint UNSIGNED NOT NULL,
-  `report_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `report_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `report_type_id` bigint UNSIGNED NOT NULL,
-  `reportable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reportable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `reportable_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `status` enum('pending','reviewed','resolved','dismissed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` enum('pending','reviewed','resolved','dismissed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `reviewed_by` bigint UNSIGNED DEFAULT NULL,
   `reviewed_at` timestamp NULL DEFAULT NULL,
-  `admin_notes` text COLLATE utf8mb4_unicode_ci,
-  `contact_phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `admin_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `contact_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -567,9 +630,9 @@ CREATE TABLE `reports` (
 
 CREATE TABLE `report_types` (
   `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -599,10 +662,14 @@ CREATE TABLE `reviews` (
   `rating_cleanliness` int DEFAULT NULL,
   `rating_security` int DEFAULT NULL,
   `rating_facilities` int DEFAULT NULL,
-  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `helpful_count` int NOT NULL DEFAULT '0',
   `is_flagged` tinyint(1) NOT NULL DEFAULT '0',
-  `is_visible` tinyint(1) NOT NULL DEFAULT '1',
+  `is_visible` tinyint(1) NOT NULL DEFAULT '0',
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `rejection_reason` text COLLATE utf8mb4_unicode_ci,
+  `moderated_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `moderated_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -611,23 +678,24 @@ CREATE TABLE `reviews` (
 -- Dumping data for table `reviews`
 --
 
-INSERT INTO `reviews` (`id`, `kos_id`, `user_id`, `rating`, `rating_cleanliness`, `rating_security`, `rating_facilities`, `comment`, `helpful_count`, `is_flagged`, `is_visible`, `created_at`, `updated_at`) VALUES
-(1, 1, 7, 5, 4, 5, 4, 'Pemilik kos sangat helpful dan mau membantu kalau ada masalah. Recomended!', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(2, 1, 8, 4, 5, 5, 3, 'Keamanan terjamin dengan akses kartu dan CCTV. Parkir luas untuk motor maupun mobil.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(3, 2, 7, 4, 5, 4, 4, 'Nyaman untuk belajar. Suasana tenang dan tidak bising. WiFi juga kencang untuk kerja.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(4, 2, 8, 5, 5, 5, 3, 'Sudah tinggal 3 bulan di sini, sangat puas. Kamar mandi selalu bersih dan tidak ada masalah.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(5, 3, 7, 5, 5, 4, 5, 'Pemilik kos sangat helpful dan mau membantu kalau ada masalah. Recomended!', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(6, 3, 8, 5, 4, 4, 4, 'Kos sangat nyaman dan bersih. Pemilik ramah dan responsif. Sangat direkomendasikan!', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(7, 4, 7, 4, 4, 4, 3, 'Kos sangat nyaman dan bersih. Pemilik ramah dan responsif. Sangat direkomendasikan!', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(8, 4, 8, 5, 5, 5, 4, 'Pemilik kos sangat helpful dan mau membantu kalau ada masalah. Recomended!', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(9, 5, 7, 5, 4, 5, 3, 'Lokasi strategis dan fasilitas lengkap. Harga sesuai dengan kualitas. Mantap!', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(10, 5, 8, 4, 5, 5, 3, 'Lokasi strategis dan fasilitas lengkap. Harga sesuai dengan kualitas. Mantap!', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(11, 6, 7, 4, 5, 5, 3, 'Keamanan terjamin dengan akses kartu dan CCTV. Parkir luas untuk motor maupun mobil.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(12, 6, 8, 5, 4, 4, 5, 'Kamar luas dengan AC yang dingin. WiFi cepat dan stabil. Lingkungan aman dan tenang.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(13, 7, 7, 5, 4, 5, 5, 'Sudah tinggal 3 bulan di sini, sangat puas. Kamar mandi selalu bersih dan tidak ada masalah.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(14, 7, 8, 5, 4, 4, 3, 'Sudah tinggal 3 bulan di sini, sangat puas. Kamar mandi selalu bersih dan tidak ada masalah.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(15, 8, 7, 5, 4, 5, 3, 'Nyaman untuk belajar. Suasana tenang dan tidak bising. WiFi juga kencang untuk kerja.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
-(16, 8, 8, 4, 4, 5, 4, 'Pelayanan sangat baik. Pemilik fast response. Kos-nya sesuai dengan foto di aplikasi.', 0, 0, 1, '2026-05-29 20:50:50', '2026-05-29 20:50:50');
+INSERT INTO `reviews` (`id`, `kos_id`, `user_id`, `rating`, `rating_cleanliness`, `rating_security`, `rating_facilities`, `comment`, `helpful_count`, `is_flagged`, `is_visible`, `status`, `rejection_reason`, `moderated_by`, `moderated_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 7, 5, 4, 5, 4, 'Pemilik kos sangat helpful dan mau membantu kalau ada masalah. Recomended!', 0, 0, 1, 'approved', NULL, '1', '2026-06-02 09:40:38', '2026-05-29 20:50:50', '2026-06-02 09:40:38'),
+(2, 1, 8, 4, 5, 5, 3, 'Keamanan terjamin dengan akses kartu dan CCTV. Parkir luas untuk motor maupun mobil.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(3, 2, 7, 4, 5, 4, 4, 'Nyaman untuk belajar. Suasana tenang dan tidak bising. WiFi juga kencang untuk kerja.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(4, 2, 8, 5, 5, 5, 3, 'Sudah tinggal 3 bulan di sini, sangat puas. Kamar mandi selalu bersih dan tidak ada masalah.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(5, 3, 7, 5, 5, 4, 5, 'Pemilik kos sangat helpful dan mau membantu kalau ada masalah. Recomended!', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(6, 3, 8, 5, 4, 4, 4, 'Kos sangat nyaman dan bersih. Pemilik ramah dan responsif. Sangat direkomendasikan!', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(7, 4, 7, 4, 4, 4, 3, 'Kos sangat nyaman dan bersih. Pemilik ramah dan responsif. Sangat direkomendasikan!', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(8, 4, 8, 5, 5, 5, 4, 'Pemilik kos sangat helpful dan mau membantu kalau ada masalah. Recomended!', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(9, 5, 7, 5, 4, 5, 3, 'Lokasi strategis dan fasilitas lengkap. Harga sesuai dengan kualitas. Mantap!', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(10, 5, 8, 4, 5, 5, 3, 'Lokasi strategis dan fasilitas lengkap. Harga sesuai dengan kualitas. Mantap!', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(11, 6, 7, 4, 5, 5, 3, 'Keamanan terjamin dengan akses kartu dan CCTV. Parkir luas untuk motor maupun mobil.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(12, 6, 8, 5, 4, 4, 5, 'Kamar luas dengan AC yang dingin. WiFi cepat dan stabil. Lingkungan aman dan tenang.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(13, 7, 7, 5, 4, 5, 5, 'Sudah tinggal 3 bulan di sini, sangat puas. Kamar mandi selalu bersih dan tidak ada masalah.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(14, 7, 8, 5, 4, 4, 3, 'Sudah tinggal 3 bulan di sini, sangat puas. Kamar mandi selalu bersih dan tidak ada masalah.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(15, 8, 7, 5, 4, 5, 3, 'Nyaman untuk belajar. Suasana tenang dan tidak bising. WiFi juga kencang untuk kerja.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(16, 8, 8, 4, 4, 5, 4, 'Pelayanan sangat baik. Pemilik fast response. Kos-nya sesuai dengan foto di aplikasi.', 0, 0, 1, 'pending', NULL, NULL, NULL, '2026-05-29 20:50:50', '2026-05-29 20:50:50'),
+(17, 11, 10, 5, 5, 5, 4, 'Nyaman, Aman sentosa, tentram.', 0, 0, 1, 'approved', NULL, '1', '2026-06-09 10:06:32', '2026-06-09 07:19:57', '2026-06-09 10:06:32');
 
 -- --------------------------------------------------------
 
@@ -636,11 +704,11 @@ INSERT INTO `reviews` (`id`, `kos_id`, `user_id`, `rating`, `rating_cleanliness`
 --
 
 CREATE TABLE `sessions` (
-  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_activity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -649,7 +717,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('BpqOP0hCJjL4TcztvE0Zv03hj75sonmYi9tozs3q', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJPdDdyVnByQTRhcnVYWGpIUFo3a25TRVhBNXFkcVhQUGZTS1lVNUxQIiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL3ByZXNlbmNlXC9vd25lclwvMiIsInJvdXRlIjoib3duZXIucHJlc2VuY2Uuc2hvdyJ9LCJ1cmwiOltdLCJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI6N30=', 1780302332);
+('B9KFOZn00sCgMmVHIOAcKtYxTbSaNdKV40z9ox3R', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiI4d1MwOW5WYmNOaGpPaDFOaWN5Q1VzZjRWRGQ2SHAxVGVVcGNGWXFLIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2NoZWNra29zLnRlc3QiLCJyb3V0ZSI6ImhvbWUifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI6MSwidXNlcl9pZCI6MSwidXNlcl9uYW1lIjoiQWRtaW4gS29zQ2hlY2siLCJ1c2VyX2VtYWlsIjoiYWRtaW5Aa29zY2hlY2suaWQiLCJ1c2VyX3JvbGUiOiJhZG1pbiIsInVzZXJfaW5zdGl0dXRpb24iOm51bGwsInVzZXJfcGhvbmUiOm51bGx9', 1781030112),
+('obLybZWrLkWmtSBE8DEBrkYiCk0H9ULHpvxcCo7G', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJuQVRSSlBoRUhSTXdlWjd1N1dhZWRlMFhmNzJmNm9lemh1VGluMXJKIiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2FkbWluIiwicm91dGUiOiJhZG1pbiJ9LCJ1cmwiOltdLCJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI6MSwidXNlcl9pZCI6MSwidXNlcl9uYW1lIjoiQWRtaW4gS29zQ2hlY2siLCJ1c2VyX2VtYWlsIjoiYWRtaW5Aa29zY2hlY2suaWQiLCJ1c2VyX3JvbGUiOiJhZG1pbiIsInVzZXJfaW5zdGl0dXRpb24iOm51bGwsInVzZXJfcGhvbmUiOm51bGx9', 1781027600),
+('XZ0f4OCyBwNHsvXcQWmt0vFLENeRsWLOHUebn3Y3', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJlb2VhUzVvNDBhTVdUcUM2MnJlV3pQZnhxTHdrck4wYnd4ZzBRbjAxIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2NoZWNra29zLnRlc3QiLCJyb3V0ZSI6ImhvbWUifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1781028514);
 
 -- --------------------------------------------------------
 
@@ -659,33 +729,36 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 CREATE TABLE `users` (
   `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` enum('mahasiswa','owner','admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mahasiswa',
-  `university` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` enum('mahasiswa','owner','admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mahasiswa',
+  `university` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `last_login_at` timestamp NULL DEFAULT NULL,
+  `last_seen_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `role`, `university`, `phone`, `avatar`, `is_active`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Admin KosCheck', 'admin@koscheck.id', '2026-05-29 20:50:46', '$2y$12$5rbyuSxPAKIwRNpBADeMfuNpVw5fp8qb7nH1o/QdQluFa/4DOqwbe', 'admin', NULL, NULL, NULL, 1, NULL, '2026-05-29 20:50:46', '2026-05-29 20:50:46'),
-(2, 'Budi Santoso', 'owner@email.com', '2026-05-29 20:50:46', '$2y$12$UZ.c74g466wO8.AHxk5QuuRe42ik9mvxulaVZ6Ouzibx/WyYBbez2', 'owner', NULL, '081234567890', NULL, 1, NULL, '2026-05-29 20:50:46', '2026-05-29 20:50:46'),
-(3, 'Siti Rahayu', 'siti.owner@email.com', '2026-05-29 20:50:47', '$2y$12$NxDCv2V7DyYe1F/dx9CCm.nCeKuxoL1fEaQeQW52dOa2P.p8114n.', 'owner', NULL, '081234567891', NULL, 1, NULL, '2026-05-29 20:50:47', '2026-05-29 20:50:47'),
-(4, 'Ahmad Fauzi', 'ahmad.owner@email.com', '2026-05-29 20:50:47', '$2y$12$JUm8cmIaLWPFxl5nV9niS.o/3eUpLqhAfZ5HmZK3619q2guoqkLl.', 'owner', NULL, '081234567892', NULL, 1, NULL, '2026-05-29 20:50:47', '2026-05-29 20:50:47'),
-(5, 'Rina Wulandari', 'rina.owner@email.com', '2026-05-29 20:50:48', '$2y$12$iSZRozDMqRSNgVULnSi98.DY3WnttQFjUW9IixZ5ycq5mVY790vn2', 'owner', NULL, '081234567893', NULL, 1, NULL, '2026-05-29 20:50:48', '2026-05-29 20:50:48'),
-(6, 'Dedi Kurniawan', 'dedi.owner@email.com', '2026-05-29 20:50:48', '$2y$12$R8F8mNKaH6a8k2VPJq5bneV4pQ65vqpJ4P0VbNrrVvrsAlly6SYXq', 'owner', NULL, '081234567894', NULL, 1, NULL, '2026-05-29 20:50:48', '2026-05-29 20:50:48'),
-(7, 'Andi Wijaya', 'mahasiswa@usu.ac.id', '2026-05-29 20:50:49', '$2y$12$ekR5qPpg19dZYaOlnw52LeKbkf3iZSJd9ft9E89G2PZ1s8nRdEPsi', 'mahasiswa', 'Universitas Sumatera Utara', NULL, NULL, 1, NULL, '2026-05-29 20:50:49', '2026-05-29 20:50:49'),
-(8, 'Dewi Lestari', 'dewi@unimed.ac.id', '2026-05-29 20:50:49', '$2y$12$ovCL33kpzJPj7Kv1LiXBbu5No5C1I8eeX6yoL/B5tK7fe6vyUAplG', 'mahasiswa', 'Universitas Negeri Medan', NULL, NULL, 1, NULL, '2026-05-29 20:50:49', '2026-05-29 20:50:49');
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `role`, `university`, `phone`, `avatar`, `is_active`, `remember_token`, `created_at`, `updated_at`, `last_login_at`, `last_seen_at`) VALUES
+(1, 'Admin KosCheck', 'admin@koscheck.id', '2026-05-29 20:50:46', '$2y$12$5rbyuSxPAKIwRNpBADeMfuNpVw5fp8qb7nH1o/QdQluFa/4DOqwbe', 'admin', NULL, NULL, NULL, 1, NULL, '2026-05-29 20:50:46', '2026-06-09 11:27:54', '2026-06-09 11:27:54', '2026-06-09 11:27:54'),
+(2, 'Budi Santoso', 'owner@email.com', '2026-05-29 20:50:46', '$2y$12$UZ.c74g466wO8.AHxk5QuuRe42ik9mvxulaVZ6Ouzibx/WyYBbez2', 'owner', NULL, '081234567890', NULL, 1, NULL, '2026-05-29 20:50:46', '2026-06-09 10:05:09', '2026-06-09 08:17:42', '2026-06-09 10:05:09'),
+(3, 'Siti Rahayu', 'siti.owner@email.com', '2026-05-29 20:50:47', '$2y$12$NxDCv2V7DyYe1F/dx9CCm.nCeKuxoL1fEaQeQW52dOa2P.p8114n.', 'owner', NULL, '081234567891', NULL, 1, NULL, '2026-05-29 20:50:47', '2026-05-29 20:50:47', NULL, NULL),
+(4, 'Ahmad Fauzi', 'ahmad.owner@email.com', '2026-05-29 20:50:47', '$2y$12$JUm8cmIaLWPFxl5nV9niS.o/3eUpLqhAfZ5HmZK3619q2guoqkLl.', 'owner', NULL, '081234567892', NULL, 1, NULL, '2026-05-29 20:50:47', '2026-05-29 20:50:47', NULL, NULL),
+(5, 'Rina Wulandari', 'rina.owner@email.com', '2026-05-29 20:50:48', '$2y$12$iSZRozDMqRSNgVULnSi98.DY3WnttQFjUW9IixZ5ycq5mVY790vn2', 'owner', NULL, '081234567893', NULL, 1, NULL, '2026-05-29 20:50:48', '2026-05-29 20:50:48', NULL, NULL),
+(6, 'Dedi Kurniawan', 'dedi.owner@email.com', '2026-05-29 20:50:48', '$2y$12$R8F8mNKaH6a8k2VPJq5bneV4pQ65vqpJ4P0VbNrrVvrsAlly6SYXq', 'owner', NULL, '081234567894', NULL, 1, NULL, '2026-05-29 20:50:48', '2026-05-29 20:50:48', NULL, NULL),
+(7, 'Andi Wijaya', 'mahasiswa@usu.ac.id', '2026-05-29 20:50:49', '$2y$12$ekR5qPpg19dZYaOlnw52LeKbkf3iZSJd9ft9E89G2PZ1s8nRdEPsi', 'mahasiswa', 'Universitas Sumatera Utara', NULL, NULL, 1, NULL, '2026-05-29 20:50:49', '2026-06-09 05:45:48', '2026-06-09 05:45:48', '2026-06-09 05:45:48'),
+(8, 'Dewi Lestari', 'dewi@unimed.ac.id', '2026-05-29 20:50:49', '$2y$12$ovCL33kpzJPj7Kv1LiXBbu5No5C1I8eeX6yoL/B5tK7fe6vyUAplG', 'mahasiswa', 'Universitas Negeri Medan', NULL, NULL, 1, NULL, '2026-05-29 20:50:49', '2026-06-02 09:36:35', '2026-06-02 09:36:35', '2026-06-02 09:36:35'),
+(10, 'Muhammad Alvin Nurrahman', 'vinnr21@gmail.com', NULL, '$2y$12$QlkR4kZPgPbPNtCauGiNNuBG4PXofPR7jUHpk4CKt8NGLFXNM3h/O', 'mahasiswa', 'Universitas Islam Negeri Sumatera Utara', '081376448988', NULL, 1, NULL, '2026-06-09 06:24:56', '2026-06-09 06:24:56', '2026-06-09 06:24:56', '2026-06-09 06:24:56');
 
 --
 -- Indexes for dumped tables
@@ -735,6 +808,15 @@ ALTER TABLE `facilities`
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `favorite_kos`
+--
+ALTER TABLE `favorite_kos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `favorite_kos_user_id_kos_id_unique` (`user_id`,`kos_id`),
+  ADD KEY `favorite_kos_user_id_index` (`user_id`),
+  ADD KEY `favorite_kos_kos_id_index` (`kos_id`);
 
 --
 -- Indexes for table `jobs`
@@ -879,7 +961,7 @@ ALTER TABLE `ads`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `facilities`
@@ -894,6 +976,12 @@ ALTER TABLE `failed_jobs`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `favorite_kos`
+--
+ALTER TABLE `favorite_kos`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -903,7 +991,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `kos`
 --
 ALTER TABLE `kos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `leads`
@@ -921,13 +1009,13 @@ ALTER TABLE `local_businesses`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -939,7 +1027,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `photos`
 --
 ALTER TABLE `photos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `reports`
@@ -957,13 +1045,13 @@ ALTER TABLE `report_types`
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -981,6 +1069,13 @@ ALTER TABLE `ads`
 ALTER TABLE `bookings`
   ADD CONSTRAINT `bookings_kos_id_foreign` FOREIGN KEY (`kos_id`) REFERENCES `kos` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `bookings_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `favorite_kos`
+--
+ALTER TABLE `favorite_kos`
+  ADD CONSTRAINT `favorite_kos_kos_id_foreign` FOREIGN KEY (`kos_id`) REFERENCES `kos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `favorite_kos_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `kos`
