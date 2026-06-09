@@ -15,26 +15,30 @@ class StoreKosRequest extends FormRequest
 
     public function rules(): array
     {
+        $kos = $this->route('kos');
+        $maxPhotos = $kos && $kos->is_premium ? config('premium.max_photos') : config('premium.max_photos_free');
         return [
             'name' => [
+                'sometimes',
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('kos', 'name')->where(function ($query) {
+                Rule::unique('kos', 'name')->ignore($kos?->id)->where(function ($query) {
                     return $query->where('user_id', $this->user()?->id);
                 }),
             ],
-            'address' => 'required|string|max:500',
+            'address' => 'sometimes|required|string|max:500',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'price' => 'required|integer|min:100000|max:50000000',
-            'gender' => ['required', Rule::in(Kos::$genders)],
+            'price' => 'sometimes|required|integer|min:100000|max:50000000',
+            'gender' => ['sometimes', 'required', Rule::in(Kos::$genders)],
             'description' => 'nullable|string|max:1000',
-            'whatsapp' => 'required|string|max:20',
+            'whatsapp' => 'sometimes|required|string|max:20',
             'phone' => 'nullable|string|max:20',
+            'is_active' => 'sometimes|boolean',
             'facilities' => 'nullable|array',
-            'facilities.*' => 'exists:facilities,id',
-            'photos' => 'nullable|array|max:10',
+            'facilities.*' => 'nullable|string|max:50',
+            'photos' => ['nullable', 'array', 'max:' . $maxPhotos],
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }

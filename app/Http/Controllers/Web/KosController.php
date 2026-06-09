@@ -40,6 +40,7 @@ class KosController extends Controller
                 'type' => ucfirst($k->gender),
                 'fac' => $facilities,
                 'verified' => $k->status === 'active' && $k->is_active,
+                'is_premium' => $k->isPremium(),
                 'image' => $this->resolveImageUrl($primaryPhoto?->url),
                 'img' => $this->resolveImageUrl($primaryPhoto?->url),
                 'stock' => $k->available_rooms ?? 0,
