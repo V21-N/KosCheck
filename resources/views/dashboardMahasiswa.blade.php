@@ -51,7 +51,7 @@
 
                 @forelse($savedKos as $kos)
                 <div class="card p-4 border-none shadow-sm flex gap-4 items-center" data-hover="lift">
-                    <img src="{{ $kos->primaryPhoto ? asset('storage/' . $kos->primaryPhoto->url) : asset('images/hero-illustration.png') }}" alt="{{ $kos->name }}" class="w-20 h-16 rounded-lg object-cover flex-shrink-0">
+                    <img src="{{ resolve_image_url($kos->cover_photo?->url) }}" alt="{{ $kos->name }}" class="w-20 h-16 rounded-lg object-cover flex-shrink-0" loading="lazy">
                     <div class="flex-1 min-w-0">
                         <h3 class="font-semibold text-sm text-text truncate">{{ $kos->name }}</h3>
                         <p class="text-xs text-text-muted mt-1">{{ $kos->address ?? 'Lokasi tidak tersedia' }}</p>

@@ -252,18 +252,22 @@
                     return this.placeholderImage;
                 }
 
+                // External URLs (http, https, data)
                 if (rawImage.startsWith('http://') || rawImage.startsWith('https://') || rawImage.startsWith('data:')) {
                     return rawImage;
                 }
 
+                // Absolute path (starts with /)
                 if (rawImage.startsWith('/')) {
                     return rawImage;
                 }
 
+                // Already full URL
                 if (rawImage.startsWith('storage/')) {
                     return this.appBaseUrl + '/' + rawImage;
                 }
 
+                // Local storage path
                 return this.storageBaseUrl + '/' + rawImage.replace(/^\/+/, '');
             },
             getDetailUrl(kos) {

@@ -9,10 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Spatie\Image\Manipulations;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Kos extends Model
+class Kos extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     public static array $genders = ['putra', 'putri', 'campur'];
 
@@ -32,6 +36,12 @@ class Kos extends Model
         'is_premium',
         'premium_expires_at',
         'is_active',
+        'total_rooms',
+        'available_rooms',
+        'room_size',
+        'deposit',
+        'long_stay_discount',
+        'rules',
     ];
 
     protected $casts = [
@@ -41,6 +51,12 @@ class Kos extends Model
         'is_premium' => 'boolean',
         'is_active' => 'boolean',
         'premium_expires_at' => 'datetime',
+        'total_rooms' => 'integer',
+        'available_rooms' => 'integer',
+        'room_size' => 'integer',
+        'deposit' => 'integer',
+        'long_stay_discount' => 'boolean',
+        'rules' => 'array',
     ];
 
     protected static function booted(): void
@@ -78,12 +94,13 @@ class Kos extends Model
 
     public function photos(): HasMany
     {
-        return $this->hasMany(Photo::class)->orderBy('order');
+        return $this->hasMany(Photo::class)->orderByRaw("CASE WHEN is_primary = 1 THEN 0 ELSE 1 END")->orderBy('order');
     }
 
-    public function primaryPhoto(): BelongsTo
+    public function getCoverPhotoAttribute(): ?Photo
     {
-        return $this->belongsTo(Photo::class);
+        // Get primary photo (is_primary = true) based on flag, not first in order
+        return $this->photos->firstWhere('is_primary', true);
     }
 
     public function reviews(): HasMany
@@ -116,10 +133,10 @@ class Kos extends Model
         return $this->reviews()->where('is_visible', true)->count();
     }
 
-    public function getAvailableRoomsAttribute(): int
+    public function getAvailableRoomsAttribute($value): int
     {
-        // Placeholder: returns 3 for demo; replace with actual stock logic
-        return 3;
+        // Use the stored value if available, otherwise return 0
+        return (int) ($value ?? 0);
     }
 
     public function getLeadCountThisMonthAttribute(): int
@@ -169,5 +186,76 @@ class Kos extends Model
                     ->orWhere('address', 'like', "%{$search}%");
             });
         }
+    }
+
+    /**
+     * Register media collections for Kos
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('photos')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+            ->maxFilesize(10 * 1024 * 1024); // 10MB max per file
+    }
+
+    /**
+     * Register media conversions for image compression and responsive images
+     */
+    public function registerMediaConversions(Media $media = null): void
+    {
+        // Thumbnail for listing pages (mobile-friendly)
+        $this->addMediaConversion('thumbnail')
+            ->width(400)
+            ->height(300)
+            ->crop(Manipulations::CROP_CENTER, 400, 300)
+            ->format(Manipulations::FORMAT_WEBP)
+            ->quality(80)
+            ->withResponsiveImages()
+            ->nonQueued();
+
+        // Medium size for cards
+        $this->addMediaConversion('medium')
+            ->width(800)
+            ->height(600)
+            ->crop(Manipulations::CROP_CENTER, 800, 600)
+            ->format(Manipulations::FORMAT_WEBP)
+            ->quality(80)
+            ->withResponsiveImages()
+            ->nonQueued();
+
+        // Large size for detail pages
+        $this->addMediaConversion('large')
+            ->width(1200)
+            ->height(900)
+            ->format(Manipulations::FORMAT_WEBP)
+            ->quality(85)
+            ->withResponsiveImages()
+            ->nonQueued();
+
+        // Blurred placeholder for lazy loading
+        $this->addMediaConversion('placeholder')
+            ->width(20)
+            ->blur(10)
+            ->format(Manipulations::FORMAT_WEBP)
+            ->quality(20)
+            ->nonQueued();
+    }
+
+    /**
+     * Get the URL for a specific conversion, falling back to original
+     */
+    public function getPhotoUrl(string $conversion = 'medium'): ?string
+    {
+        $media = $this->getFirstMedia('photos');
+
+        if (!$media) {
+            return null;
+        }
+
+        if ($media->hasGeneratedConversion($conversion)) {
+            return $media->getUrl($conversion);
+        }
+
+        return $media->getUrl();
     }
 }

@@ -4,28 +4,9 @@
 @section('content')
 @php
     $fallbackImage = asset('images/hero-illustration.png');
-
-    $resolveImage = function (?string $path) use ($fallbackImage): string {
-        $path = trim((string) $path);
-
-        if ($path === '') {
-            return $fallbackImage;
-        }
-
-        if (preg_match('/^(https?:|data:)/i', $path)) {
-            return $path;
-        }
-
-        if (str_starts_with($path, '/')) {
-            return $path;
-        }
-
-        return asset('storage/' . ltrim($path, '/'));
-    };
-
     $galleryPhotos = $kos->photos->take(4)->values();
     $gallerySlots = ['Tampak Depan', 'Kamar Tidur', 'Dapur', 'Area Tambahan'];
-    $primaryPhoto = $galleryPhotos->first();
+    $coverPhoto = $kos->cover_photo;
     $breadcrumbArea = trim(\Illuminate\Support\Str::before((string) ($kos->address ?? ''), ','));
     $genderLabel = match ($kos->gender) {
         'putra' => 'Putra',
@@ -41,7 +22,7 @@
     $owner = $kos->owner;
     $ownerName = $owner?->name ?? 'Pemilik Kos';
     $ownerAvatar = $owner?->avatar
-        ? $resolveImage($owner->avatar)
+        ? resolve_image_url($owner->avatar)
         : 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=F47C20&color=fff&size=128';
     $whatsappRaw = preg_replace('/\D+/', '', (string) ($kos->whatsapp ?: $kos->phone ?: ''));
 
@@ -58,7 +39,7 @@
         'type' => 'kos',
         'name' => $kos->name,
         'location' => $kos->address,
-        'image' => $resolveImage($primaryPhoto?->url),
+        'image' => resolve_image_url($coverPhoto?->url, $fallbackImage),
     ];
 @endphp
 
@@ -96,16 +77,16 @@
 
         <div class="gallery-grid mb-8">
             <div class="gallery-main img-overlay rounded-2xl h-[250px] md:h-[400px]">
-                <img src="{{ $resolveImage($galleryPhotos[0]?->url ?? null) }}" alt="{{ $gallerySlots[0] }}" loading="lazy">
+                <img src="{{ resolve_image_url($galleryPhotos[0]?->url, $fallbackImage) }}" alt="{{ $gallerySlots[0] }}" loading="lazy">
                 <span class="img-label rounded-b-2xl">{{ $gallerySlots[0] }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 md:contents">
                 <div class="img-overlay rounded-2xl h-[120px] md:h-[196px]">
-                    <img src="{{ $resolveImage($galleryPhotos[1]?->url ?? null) }}" alt="{{ $gallerySlots[1] }}" loading="lazy">
+                    <img src="{{ resolve_image_url($galleryPhotos[1]?->url, $fallbackImage) }}" alt="{{ $gallerySlots[1] }}" loading="lazy">
                     <span class="img-label rounded-b-2xl text-[0.65rem] md:text-xs">{{ $gallerySlots[1] }}</span>
                 </div>
                 <div class="img-overlay rounded-2xl h-[120px] md:h-[196px]">
-                    <img src="{{ $resolveImage($galleryPhotos[2]?->url ?? null) }}" alt="{{ $gallerySlots[2] }}" loading="lazy">
+                    <img src="{{ resolve_image_url($galleryPhotos[2]?->url, $fallbackImage) }}" alt="{{ $gallerySlots[2] }}" loading="lazy">
                     <span class="img-label rounded-b-2xl text-[0.65rem] md:text-xs">{{ $gallerySlots[2] }}</span>
                 </div>
             </div>
@@ -283,7 +264,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($nearbyList as $nearby)
                                 <a href="{{ route('kos.show', ['slug' => $nearby->slug]) }}" class="card p-4 flex gap-4 items-center" data-hover="lift">
-                                    <img src="{{ $resolveImage($nearby->photos->first()?->url ?? null) }}" alt="{{ $nearby->name }}" class="w-24 h-24 rounded-xl object-cover flex-shrink-0">
+                                    <img src="{{ resolve_image_url($nearby->photos->first()?->url, $fallbackImage) }}" alt="{{ $nearby->name }}" class="w-24 h-24 rounded-xl object-cover flex-shrink-0" loading="lazy">
                                     <div class="min-w-0">
                                         <p class="font-bold text-text truncate">{{ $nearby->name }}</p>
                                         <p class="text-sm text-text-muted truncate">{{ $nearby->address }}</p>
@@ -352,7 +333,7 @@
                 <div class="card p-6 text-center mt-6">
                     <div class="relative inline-block mb-3">
                         <div class="w-16 h-16 rounded-full bg-gray-200 overflow-hidden mx-auto">
-                            <img src="{{ $ownerAvatar }}" alt="{{ $ownerName }}" class="w-full h-full object-cover">
+                            <img src="{{ $ownerAvatar }}" alt="{{ $ownerName }}" class="w-full h-full object-cover" loading="lazy">
                         </div>
                         <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                     </div>

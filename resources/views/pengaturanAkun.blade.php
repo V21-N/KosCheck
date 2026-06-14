@@ -41,7 +41,7 @@
 
                 <div class="flex items-center gap-4 mb-8 pb-8 border-b border-border-light">
                     <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shadow-md overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Budi+Santoso&background=F47C20&color=fff&size=64" class="w-full h-full object-cover">
+                        <img src="https://ui-avatars.com/api/?name=Budi+Santoso&background=F47C20&color=fff&size=64" class="w-full h-full object-cover" loading="lazy">
                     </div>
                     <div>
                         <h3 class="font-bold text-text">Budi Santoso</h3>

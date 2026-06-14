@@ -37,13 +37,15 @@ class KosService
             return $cached;
         }
 
-        Cache::forget($cacheKey);
-
-        return Kos::active()
+        $result = Kos::active()
             ->with(['photos' => fn($q) => $q->orderBy('is_primary', 'desc')->orderBy('order'), 'facilities', 'reviews'])
             ->premiumFirst()
             ->limit($limit)
             ->get();
+
+        Cache::put($cacheKey, $result, now()->addMinutes($this->cacheMinutes));
+
+        return $result;
     }
 
     public function getRecentKos(int $limit = 6): Collection
@@ -55,13 +57,15 @@ class KosService
             return $cached;
         }
 
-        Cache::forget($cacheKey);
-
-        return Kos::active()
+        $result = Kos::active()
             ->with(['photos' => fn($q) => $q->orderBy('is_primary', 'desc')->orderBy('order'), 'facilities'])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
+
+        Cache::put($cacheKey, $result, now()->addMinutes($this->cacheMinutes));
+
+        return $result;
     }
 
     public function getKosBySlug(string $slug): Kos
@@ -187,16 +191,26 @@ class KosService
         return $kos;
     }
 
-    public function uploadPhotos(Kos $kos, array $files): Collection
+    public function uploadPhotos(Kos $kos, array $files): \Illuminate\Support\Collection
     {
         $photos = collect();
-        $hasExistingPhotos = $kos->photos()->exists();
+        $hasExistingPhotos = $kos->getMedia('photos')->isNotEmpty();
 
         foreach ($files as $index => $file) {
-            $path = $file->store('kos-photos', 'public');
+            // Use Spatie Media Library for automatic compression and conversions
+            $media = $kos->addMedia($file)
+                ->preservingOriginal()
+                ->toMediaCollection('photos');
 
+            // Trigger conversions immediately (non-queued for simplicity)
+            $media->markAsConversionGenerated('thumbnail');
+            $media->markAsConversionGenerated('medium');
+            $media->markAsConversionGenerated('large');
+            $media->markAsConversionGenerated('placeholder');
+
+            // Also create legacy Photo record for backward compatibility
             $photo = $kos->photos()->create([
-                'url' => $path,
+                'url' => $media->getUrl(),
                 'order' => $index,
                 'is_primary' => !$hasExistingPhotos && $index === 0,
             ]);
@@ -209,6 +223,13 @@ class KosService
 
     public function deletePhoto(Photo $photo): void
     {
+        // Delete from Spatie Media Library if exists
+        $media = $photo->getFirstMedia('photos');
+        if ($media) {
+            $media->delete();
+        }
+
+        // Also delete legacy file
         if ($photo->url) {
             Storage::disk('public')->delete($photo->url);
         }
@@ -280,12 +301,23 @@ class KosService
 
     public function getKosStats(): array
     {
-        return [
+        $cacheKey = 'kos_stats';
+
+        $cached = Cache::get($cacheKey);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $result = [
             'total' => Kos::count(),
             'active' => Kos::active()->count(),
             'pending' => Kos::where('status', 'pending')->count(),
             'premium' => Kos::where('is_premium', true)->count(),
             'avg_price' => Kos::active()->avg('price'),
         ];
+
+        Cache::put($cacheKey, $result, now()->addMinutes($this->cacheMinutes));
+
+        return $result;
     }
 }

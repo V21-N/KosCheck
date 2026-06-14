@@ -13,7 +13,7 @@ class PhotoResource extends JsonResource
             'id' => $this->id,
             'kos_id' => $this->kos_id,
             'url' => $this->url,
-            'full_url' => $this->url ? asset('storage/' . $this->url) : null,
+            'full_url' => resolve_image_url($this->url),
             'order' => $this->order,
             'created_at' => $this->created_at?->toIso8601String(),
         ];

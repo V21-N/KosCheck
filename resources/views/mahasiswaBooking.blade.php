@@ -71,7 +71,7 @@
             <div class="card bg-white border border-border-light p-5 rounded-2xl">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div class="flex items-start gap-4">
-                        <img src="{{ $booking['photo'] }}" alt="{{ $booking['kos_name'] }}" class="w-24 h-20 rounded-xl object-cover flex-shrink-0">
+                        <img src="{{ $booking['photo'] }}" alt="{{ $booking['kos_name'] }}" class="w-24 h-20 rounded-xl object-cover flex-shrink-0" loading="lazy">
                         <div>
                             <h3 class="font-bold text-lg">{{ $booking['kos_name'] }}</h3>
                             <p class="text-sm text-text-muted">{{ $booking['kos_address'] }}</p>

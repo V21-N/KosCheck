@@ -28,19 +28,21 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| Public Routes (Guest-Only - Redirect Authenticated Users)
 |--------------------------------------------------------------------------
 */
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/kos', [KosController::class, 'index'])->name('kos.index');
-Route::get('/kos/{slug}', [KosController::class, 'show'])->name('kos.show');
-Route::get('/presence/owner/{user}', function (User $user) {
-    return response()->json([
-        'is_online' => (bool) $user->is_online,
-        'last_seen_at' => $user->last_seen_at?->toIso8601String(),
-        'name' => $user->name,
-    ]);
-})->name('owner.presence.show');
+Route::middleware('guest_guard')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/kos', [KosController::class, 'index'])->name('kos.index');
+    Route::get('/kos/{slug}', [KosController::class, 'show'])->name('kos.show');
+    Route::get('/presence/owner/{user}', function (User $user) {
+        return response()->json([
+            'is_online' => (bool) $user->is_online,
+            'last_seen_at' => $user->last_seen_at?->toIso8601String(),
+            'name' => $user->name,
+        ]);
+    })->name('owner.presence.show');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -52,10 +54,10 @@ Route::get('/lead/{slug}', [LeadController::class, 'redirect'])->name('lead.redi
 
 /*
 |--------------------------------------------------------------------------
-| Guest Routes (No Login Required)
+| Guest Routes (No Login Required - Redirect Authenticated Users)
 |--------------------------------------------------------------------------
 */
-Route::middleware('guest')->group(function () {
+Route::middleware('guest_guard')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
@@ -195,12 +197,17 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes (No Auth Required)
+| Public Routes (Guest-Only - Redirect Authenticated Users)
 |--------------------------------------------------------------------------
 */
-Route::view('/layanan-galon', 'layananGalon')->name('layanan-galon');
-Route::view('/bantuan', 'bantuanDanFaq')->name('bantuan');
-Route::view('/partner/{slug}', 'detailPartner')->name('detail-partner');
+Route::middleware('guest_guard')->group(function () {
+    Route::view('/bantuan', 'bantuanDanFaq')->name('bantuan');
+    Route::view('/bantuan/panduan', 'guide')->name('guide');
+    Route::view('/bantuan/kebijakan-privasi', 'privacy')->name('privacy');
+    Route::view('/bantuan/syarat-dan-ketentuan', 'terms')->name('terms');
+    Route::view('/bantuan/layanan-galon', 'layananGalon')->name('layanan-galon');
+    Route::view('/partner/{slug}', 'detailPartner')->name('detail-partner');
+});
 
 /*
 |--------------------------------------------------------------------------

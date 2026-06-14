@@ -158,18 +158,6 @@ class KosController extends Controller
 
     protected function resolveImageUrl(?string $path): string
     {
-        if (!$path) {
-            return asset('images/hero-illustration.png');
-        }
-
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
-            return $path;
-        }
-
-        if (str_starts_with($path, '/')) {
-            return $path;
-        }
-
-        return asset('storage/' . ltrim($path, '/'));
+        return resolve_image_url($path);
     }
 }

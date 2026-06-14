@@ -742,3 +742,31 @@ input[type="range"]::-webkit-slider-thumb {
         padding: 0 1rem;
     }
 }
+
+
+/* ─── Disable Hover Effects on Mobile for Performance ─── */
+@media (hover: none) and (pointer: coarse) {
+    .btn-primary:hover,
+    .btn-primary-outline:hover,
+    .btn-whatsapp:hover,
+    .btn-dark:hover,
+    .btn-white:hover,
+    .card:hover,
+    .img-overlay:hover img,
+    .page-btn:hover,
+    .breadcrumb a:hover,
+    .owner-nav-item:hover,
+    .darkmode-toggle:hover,
+    #back-to-top-btn:hover,
+    html.dark .btn-white:hover,
+    html.dark .owner-nav-item:hover,
+    html.dark .btn-primary:hover,
+    html.dark .btn-primary-outline:hover,
+    html.dark a.text-primary:hover,
+    .toast-notification .toast-close:hover {
+        background-color: inherit;
+        color: inherit;
+        transform: none;
+        box-shadow: none;
+    }
+}

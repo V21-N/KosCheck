@@ -2,30 +2,12 @@
 @section('title', 'Formulir Booking — KosCheck')
 
 @php
-    $resolveImage = function (?string $path): string {
-        $path = trim((string) $path);
-
-        if ($path === '') {
-            return asset('images/hero-illustration.png');
-        }
-
-        if (preg_match('/^(https?:|data:)/i', $path)) {
-            return $path;
-        }
-
-        if (str_starts_with($path, '/')) {
-            return $path;
-        }
-
-        return asset('storage/' . ltrim($path, '/'));
-    };
-
     $currentUser = $user ?? auth()->user();
     $owner = $owner ?? $kos->owner;
-    $primaryPhoto = $kos->photos->first();
+    $coverPhoto = $kos->cover_photo;
     $ownerName = $owner?->name ?? 'Pemilik Kos';
     $ownerAvatar = $owner?->avatar
-        ? $resolveImage($owner->avatar)
+        ? resolve_image_url($owner->avatar)
         : 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=2ECC71&color=fff&size=128';
     $ownerOnline = (bool) ($owner?->is_online ?? false);
     $ownerStatusLabel = $ownerOnline ? 'Online' : 'Offline';
@@ -132,7 +114,7 @@
                         <div class="bg-gray-50 rounded-xl p-5 mb-8 flex items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <div class="relative">
-                                    <img src="{{ $ownerAvatar }}" alt="{{ $ownerName }}" class="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover">
+                                    <img src="{{ $ownerAvatar }}" alt="{{ $ownerName }}" class="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover" loading="lazy">
                                     <div id="owner-status-dot" class="absolute bottom-0 right-0 w-3.5 h-3.5 {{ $ownerOnline ? 'bg-green-500' : 'bg-gray-400' }} border-2 border-white rounded-full"></div>
                                 </div>
                                 <div>
@@ -179,7 +161,7 @@
                 <div class="sticky top-24 space-y-6">
                     <div class="card overflow-hidden" data-hover="lift">
                         <div class="h-40 overflow-hidden">
-                            <img src="{{ $resolveImage($primaryPhoto?->url) }}" alt="{{ $kos->name }}" class="w-full h-full object-cover" loading="lazy">
+                            <img src="{{ resolve_image_url($coverPhoto?->url) }}" alt="{{ $kos->name }}" class="w-full h-full object-cover" loading="lazy">
                         </div>
                         <div class="p-5">
                             <div class="flex items-start justify-between mb-2">

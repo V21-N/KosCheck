@@ -20,17 +20,10 @@
             <aside class="space-y-6">
                 <div class="card overflow-hidden" data-hover="lift">
                     @php
-                        $resolveImage = function (?string $path): string {
-                            $path = trim((string) $path);
-                            if ($path === '') return asset('images/hero-illustration.png');
-                            if (preg_match('/^(https?:|data:)/i', $path)) return $path;
-                            if (str_starts_with($path, '/')) return $path;
-                            return asset('storage/' . ltrim($path, '/'));
-                        };
-                        $primaryPhotoUrl = $kos->photos->first()?->url ?? null;
+                        $coverPhotoUrl = resolve_image_url($kos->cover_photo?->url);
                     @endphp
                     <div class="aspect-[16/10] overflow-hidden">
-                        <img src="{{ $resolveImage($primaryPhotoUrl) }}" alt="{{ $kos->name }}" class="h-full w-full object-cover" loading="lazy">
+                        <img src="{{ $coverPhotoUrl }}" alt="{{ $kos->name }}" class="h-full w-full object-cover" loading="lazy">
                     </div>
                     <div class="p-5">
                         <div class="flex items-center gap-2 mb-3">

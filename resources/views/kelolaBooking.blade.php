@@ -99,7 +99,7 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="p-4 pl-6">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $booking['avatar'] }}" class="w-9 h-9 rounded-full object-cover ring-1 ring-gray-200" alt="{{ $booking['nama'] }}">
+                                    <img src="{{ $booking['avatar'] }}" class="w-9 h-9 rounded-full object-cover ring-1 ring-gray-200" alt="{{ $booking['nama'] }}" loading="lazy">
                                     <div>
                                         <p class="font-bold text-text">{{ $booking['nama'] }}</p>
                                         <p class="text-[0.65rem] text-text-muted">{{ $booking['universitas'] }}</p>
@@ -109,7 +109,7 @@
                             </td>
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $booking['kos_photo'] }}" alt="{{ $booking['kos'] }}" class="w-16 h-16 rounded-2xl object-cover">
+                                    <img src="{{ $booking['kos_photo'] }}" alt="{{ $booking['kos'] }}" class="w-16 h-16 rounded-2xl object-cover" loading="lazy">
                                     <div>
                                         <p class="font-semibold text-text">{{ $booking['kos'] }}</p>
                                         <p class="text-xs text-text-muted">{{ $booking['tanggal'] }}</p>

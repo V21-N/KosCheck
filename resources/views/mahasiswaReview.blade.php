@@ -50,9 +50,9 @@
                     {{-- Kos Image --}}
                     @if($review->kos && $review->kos->photos->first())
                         <div class="w-full sm:w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
-                            <img src="{{ asset('storage/' . $review->kos->photos->first()->url) }}"
+                            <img src="{{ resolve_image_url($review->kos->photos->first()?->url) }}"
                                  alt="{{ $review->kos->name }}"
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover" loading="lazy">
                         </div>
                     @endif
 

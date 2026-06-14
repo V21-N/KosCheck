@@ -133,18 +133,12 @@
     </div>
 
     @php
-        $resolveImage = function (?string $path): string {
-            $path = trim((string) $path);
-            if ($path === '') return asset('images/hero-illustration.png');
-            if (preg_match('/^(https?:|data:)/i', $path)) return $path;
-            if (str_starts_with($path, '/')) return $path;
-            return asset('storage/' . ltrim($path, '/'));
-        };
+        $fallbackImage = asset('images/hero-illustration.png');
     @endphp
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-animate-container">
         @forelse($kosWithStats as $kos)
             @php
-                $photoUrl = $resolveImage($kos->photos->first()?->url ?? null);
+                $photoUrl = resolve_image_url($kos->photos->first()?->url, $fallbackImage);
                 $rating = $kos->avg_rating !== null ? number_format((float) $kos->avg_rating, 1) : '-';
                 $price = number_format((int) $kos->price, 0, ',', '.');
                 $statusClass = $kos->status === 'active'
@@ -153,7 +147,7 @@
             @endphp
             <div class="card border-none shadow-md overflow-hidden bg-white p-4 pb-5 rounded-2xl" data-hover="lift" data-reveal>
                 <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-                    <img src="{{ $photoUrl }}" class="w-full h-full object-cover" alt="{{ $kos->name }}">
+                    <img src="{{ $photoUrl }}" class="w-full h-full object-cover" alt="{{ $kos->name }}" loading="lazy">
                     <span class="absolute top-3 right-3 badge {{ $statusClass }} text-white text-[0.65rem] px-3 shadow-sm border">
                         {{ ucfirst($kos->status) }}
                     </span>

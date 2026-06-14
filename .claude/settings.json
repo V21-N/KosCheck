@@ -98,7 +98,9 @@
       "PowerShell(cd c:\\\\laragon\\\\www\\\\CheckKos; \\($env:APP_ENV=\"local\"\\); \\($env:APP_KEY=\"base64:jl22y6EiSOKTWZe7dPz456Z36hhxVgsw5nAKQ7LY5Oc=\"\\); php artisan serve --host=127.0.0.1 --port=8000 2>&1)",
       "PowerShell(Get-Content \"c:\\\\laragon\\\\www\\\\CheckKos\\\\.env\" -Raw | Select-String -Pattern \"APP_KEY\" -AllMatches | ForEach-Object { $_.Matches.Value })",
       "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"c:\\\\laragon\\\\www\\\\CheckKos\\\\.env\"\\)[0..20]; $bytes | ForEach-Object { [char]$_ })",
-      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"c:\\\\laragon\\\\www\\\\CheckKos\\\\.env\"\\)[0..3]; $bytes)"
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"c:\\\\laragon\\\\www\\\\CheckKos\\\\.env\"\\)[0..3]; $bytes)",
+      "Bash(Test-Path public\\\\storage)",
+      "Bash(composer dump-autoload *)"
     ],
     "additionalDirectories": [
       "C:\\laragon\\www\\CheckKos\\storage\\framework\\views"

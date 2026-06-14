@@ -75,18 +75,14 @@
 </div>
 
 @php
-    $resolveImage = function (?string $path): string {
-        $path = trim((string) $path);
-        if ($path === '') return asset('images/hero-illustration.png');
-        if (preg_match('/^(https?:|data:)/i', $path)) return $path;
-        if (str_starts_with($path, '/')) return $path;
-        return asset('storage/' . ltrim($path, '/'));
-    };
+    $fallbackImage = asset('images/hero-illustration.png');
 @endphp
 <div class="space-y-5">
     @forelse($kosList as $kos)
         @php
-            $photoUrl = $resolveImage($kos->photos->first()?->url ?? null);
+            // Get cover photo (is_primary = true) or first photo
+            $coverPhoto = $kos->cover_photo;
+            $photoUrl = resolve_image_url($coverPhoto?->url, $fallbackImage);
             $price = number_format((int) $kos->price, 0, ',', '.');
             $rating = $kos->reviews_count > 0 ? number_format((float) ($kos->avg_rating ?? 0), 1) : '-';
             $statusClass = $kos->status === 'active'
@@ -95,7 +91,7 @@
         @endphp
         <div class="card bg-white shadow-sm border border-border-light overflow-hidden flex flex-col md:flex-row rounded-3xl relative pr-6" data-hover="lift" data-reveal>
             <div class="relative w-full md:w-72 h-56 md:h-auto flex-shrink-0">
-                <img src="{{ $photoUrl }}" class="w-full h-full object-cover" alt="{{ $kos->name }}">
+                <img src="{{ $photoUrl }}" class="w-full h-full object-cover" alt="{{ $kos->name }}" loading="lazy">
                 <div class="absolute top-3 left-3 flex gap-2 flex-wrap">
                     <span class="badge {{ $statusClass }} text-white text-[0.65rem] border shadow-sm">
                         {{ ucfirst($kos->status) }}

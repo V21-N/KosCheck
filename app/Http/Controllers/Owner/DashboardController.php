@@ -157,7 +157,7 @@ class DashboardController extends Controller
 
         $query = Auth::user()
             ->kos()
-            ->with(['photos', 'facilities'])
+            ->with(['photos' => fn($q) => $q->orderByRaw("CASE WHEN is_primary = 1 THEN 0 ELSE 1 END")->orderBy('order'), 'facilities'])
             ->withCount(['bookings', 'reviews'])
             ->withAvg('reviews as avg_rating', 'rating');
 
@@ -189,11 +189,22 @@ class DashboardController extends Controller
 
     public function store(Request $request)
     {
+        // Parse rules from JSON string to array before validation
+        $rulesInput = $request->input('rules', []);
+        if (is_string($rulesInput)) {
+            $rulesInput = json_decode($rulesInput, true) ?? [];
+        }
+
         $request->merge([
             'price' => (int) preg_replace('/\D+/', '', (string) $request->input('price')),
             'latitude' => $request->filled('latitude') ? (float) str_replace(',', '.', (string) $request->input('latitude')) : null,
             'longitude' => $request->filled('longitude') ? (float) str_replace(',', '.', (string) $request->input('longitude')) : null,
             'whatsapp' => trim((string) ($request->input('whatsapp') ?: $request->user()?->phone)),
+            'deposit' => $request->filled('deposit') ? (int) preg_replace('/\D+/', '', (string) $request->input('deposit')) : null,
+            'total_rooms' => $request->filled('total_rooms') ? (int) $request->input('total_rooms') : null,
+            'available_rooms' => $request->filled('available_rooms') ? (int) $request->input('available_rooms') : null,
+            'room_size' => $request->filled('room_size') ? (int) $request->input('room_size') : null,
+            'rules' => $rulesInput,
         ]);
 
         $validated = $request->validate([
@@ -214,13 +225,22 @@ class DashboardController extends Controller
             'facilities' => ['nullable', 'array'],
             'facilities.*' => ['nullable', 'string', 'max:50'],
             'photos' => ['nullable', 'array', 'max:10'],
-            'photos.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'photos.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp,heic', 'max:5120'],
+            'total_rooms' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'available_rooms' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'room_size' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'deposit' => ['nullable', 'integer', 'min:0', 'max:999999999'],
+            'long_stay_discount' => ['nullable', 'boolean'],
+            'rules' => ['nullable', 'array'],
         ], [
             'whatsapp.required' => 'Nomor WhatsApp wajib diisi.',
             'photos.max' => 'Maksimal 10 foto.',
             'photos.*.image' => 'File harus berupa gambar.',
-            'photos.*.mimes' => 'Format gambar harus jpeg, png, jpg, gif, atau webp.',
-            'photos.*.max' => 'Ukuran foto maksimal 2MB.',
+            'photos.*.mimes' => 'Format gambar harus JPEG, PNG, JPG, GIF, WebP, atau HEIC.',
+            'photos.*.max' => 'Ukuran foto maksimal 5MB.',
+            'total_rooms.min' => 'Total kamar tidak boleh negatif.',
+            'available_rooms.min' => 'Kamar tersedia tidak boleh negatif.',
+            'room_size.min' => 'Luas kamar tidak boleh negatif.',
         ]);
 
         $facilityIds = $this->resolveFacilityIds($validated['facilities'] ?? [])
@@ -246,6 +266,12 @@ class DashboardController extends Controller
                     'phone' => $validated['phone'] ?? null,
                     'status' => 'pending', // Pending verification by admin
                     'is_active' => false, // Not visible until approved
+                    'total_rooms' => $validated['total_rooms'] ?? null,
+                    'available_rooms' => $validated['available_rooms'] ?? null,
+                    'room_size' => $validated['room_size'] ?? null,
+                    'deposit' => $validated['deposit'] ?? null,
+                    'long_stay_discount' => $validated['long_stay_discount'] ?? false,
+                    'rules' => $validated['rules'] ?? [],
                 ]);
 
                 foreach ($request->file('photos', []) as $index => $photo) {
@@ -373,7 +399,99 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-        $this->kosService->updateKos($kos, $validated);
+        // Parse rules from JSON string if needed
+        $rulesInput = $request->input('rules', []);
+        if (is_string($rulesInput)) {
+            $rulesInput = json_decode($rulesInput, true) ?? [];
+        }
+
+        // Update all kos fields including new ones
+        $kos->update([
+            'name' => $validated['name'] ?? $kos->name,
+            'address' => $validated['address'] ?? $kos->address,
+            'latitude' => $validated['latitude'] ?? $kos->latitude,
+            'longitude' => $validated['longitude'] ?? $kos->longitude,
+            'price' => $validated['price'] ?? $kos->price,
+            'gender' => $validated['gender'] ?? $kos->gender,
+            'description' => $validated['description'] ?? $kos->description,
+            'whatsapp' => $validated['whatsapp'] ?? $kos->whatsapp,
+            'phone' => $validated['phone'] ?? $kos->phone,
+            'total_rooms' => $validated['total_rooms'] ?? null,
+            'available_rooms' => $validated['available_rooms'] ?? null,
+            'room_size' => $validated['room_size'] ?? null,
+            'deposit' => $validated['deposit'] ?? null,
+            'long_stay_discount' => $validated['long_stay_discount'] ?? false,
+            'rules' => $rulesInput,
+        ]);
+
+        // Sync facilities
+        $kos->facilities()->sync($validated['facilities'] ?? []);
+
+        // Handle photo deletions - delete photos that were removed by user
+        $deletedPhotoIds = $request->input('deleted_photos', []);
+        if (!empty($deletedPhotoIds)) {
+            $deletedPhotoIds = array_map('intval', (array) $deletedPhotoIds);
+            $photosToDelete = $kos->photos()->whereIn('id', $deletedPhotoIds)->get();
+            foreach ($photosToDelete as $photo) {
+                $this->kosService->deletePhoto($photo);
+            }
+        }
+
+        // Handle photo order and cover photo update
+        $photoOrders = $request->input('photo_order', []);
+        $isCovers = $request->input('is_cover', []);
+
+        if (!empty($photoOrders)) {
+            foreach ($photoOrders as $index => $photoId) {
+                // Skip new photos (they don't exist yet)
+                if (str_starts_with($photoId, 'new_')) {
+                    continue;
+                }
+
+                $photoIdInt = (int) $photoId;
+                $isCover = isset($isCovers[$index]) && $isCovers[$index] === '1';
+
+                $kos->photos()->where('id', $photoIdInt)->update([
+                    'order' => $index,
+                    'is_primary' => $isCover,
+                ]);
+            }
+        }
+
+        // Handle new photo uploads
+        $newPhotos = $request->file('photos', []);
+        if (!empty($newPhotos)) {
+            // Get existing photo count to determine starting order
+            $existingCount = $kos->photos()->count();
+            $newPhotoOrders = [];
+            $newPhotoCovers = [];
+
+            // Find indices for new photos in the order array
+            foreach ($photoOrders as $index => $photoId) {
+                if (str_starts_with($photoId, 'new_')) {
+                    $newIndex = (int) str_replace('new_', '', $photoId);
+                    $newPhotoOrders[$newIndex] = $existingCount + count($newPhotoOrders);
+                    $newPhotoCovers[$newIndex] = isset($isCovers[$index]) && $isCovers[$index] === '1';
+                }
+            }
+
+            // Upload new photos
+            foreach ($newPhotos as $newIndex => $file) {
+                $path = $file->store('kos-photos', 'public');
+                $newPhoto = $kos->photos()->create([
+                    'url' => $path,
+                    'order' => $newPhotoOrders[$newIndex] ?? $existingCount + $newIndex,
+                    'is_primary' => $newPhotoCovers[$newIndex] ?? false,
+                ]);
+
+                // If this is the cover photo, unset other primary flags
+                if ($newPhotoCovers[$newIndex] ?? false) {
+                    $kos->photos()->where('id', '!=', $newPhoto->id)->update(['is_primary' => false]);
+                }
+            }
+        }
+
+        Cache::flush();
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -459,11 +577,7 @@ class DashboardController extends Controller
         $bookings = $query->get();
 
         $resolveImage = function (?string $path): string {
-            $path = trim((string) $path);
-            if ($path === '') return asset('images/hero-illustration.png');
-            if (preg_match('/^(https?:|data:)/i', $path)) return $path;
-            if (str_starts_with($path, '/')) return $path;
-            return asset('storage/' . ltrim($path, '/'));
+            return resolve_image_url($path);
         };
 
         $bookingData = $bookings->map(function (Booking $booking) use ($resolveImage) {
@@ -475,9 +589,7 @@ class DashboardController extends Controller
                 'id' => $booking->id,
                 'nama' => $mahasiswa?->name ?? '-',
                 'universitas' => $mahasiswa?->university ?? '-',
-                'avatar' => $mahasiswa?->avatar
-                    ? asset('storage/' . ltrim($mahasiswa->avatar, '/'))
-                    : 'https://ui-avatars.com/api/?name=' . urlencode($mahasiswa?->name ?? 'Mahasiswa') . '&background=3B82F6&color=fff&size=96',
+                'avatar' => resolve_image_url($mahasiswa?->avatar),
                 'kos' => $kos?->name ?? '-',
                 'kos_slug' => $kos?->slug,
                 'kos_photo' => $resolveImage($photo?->url ?? null),

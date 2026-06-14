@@ -28,7 +28,7 @@ export function initScrollAnimation() {
                 }
             });
         } catch (e) {
-            console.debug('Selector failed:', selector);
+            // Silent fail for selector errors
         }
     });
 

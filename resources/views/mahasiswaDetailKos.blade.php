@@ -3,26 +3,9 @@
 
 @section('content')
 @php
-    $resolveImage = function (?string $path): string {
-        $path = trim((string) $path);
-
-        if ($path === '') {
-            return asset('images/hero-illustration.png');
-        }
-
-        if (preg_match('/^(https?:|data:)/i', $path)) {
-            return $path;
-        }
-
-        if (str_starts_with($path, '/')) {
-            return $path;
-        }
-
-        return asset('storage/' . ltrim($path, '/'));
-    };
-
+    $fallbackImage = asset('images/hero-illustration.png');
     $photos = $kos->photos->take(4)->values();
-    $primaryPhoto = $photos->first();
+    $coverPhoto = $kos->cover_photo;
     $area = trim(\Illuminate\Support\Str::before((string) ($kos->address ?? ''), ','));
     $genderLabel = match ($kos->gender) {
         'putra' => 'Putra',
@@ -60,16 +43,16 @@
             <div class="lg:col-span-2">
                 <div class="gallery-grid mb-8">
                     <div class="gallery-main img-overlay rounded-2xl h-[250px] md:h-[400px]">
-                        <img src="{{ $resolveImage($photos[0]?->url ?? null) }}" alt="{{ $kos->name }}" loading="lazy">
+                        <img src="{{ resolve_image_url($photos[0]?->url, $fallbackImage) }}" alt="{{ $kos->name }}" loading="lazy">
                         <span class="img-label rounded-b-2xl">Tampak Depan</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 md:contents">
                         <div class="img-overlay rounded-2xl h-[120px] md:h-[196px]">
-                            <img src="{{ $resolveImage($photos[1]?->url ?? null) }}" alt="{{ $kos->name }}" loading="lazy">
+                            <img src="{{ resolve_image_url($photos[1]?->url, $fallbackImage) }}" alt="{{ $kos->name }}" loading="lazy">
                             <span class="img-label rounded-b-2xl text-[0.65rem] md:text-xs">Kamar</span>
                         </div>
                         <div class="img-overlay rounded-2xl h-[120px] md:h-[196px]">
-                            <img src="{{ $resolveImage($photos[2]?->url ?? null) }}" alt="{{ $kos->name }}" loading="lazy">
+                            <img src="{{ resolve_image_url($photos[2]?->url, $fallbackImage) }}" alt="{{ $kos->name }}" loading="lazy">
                             <span class="img-label rounded-b-2xl text-[0.65rem] md:text-xs">Area Lain</span>
                         </div>
                     </div>
@@ -193,7 +176,7 @@
                     <div class="card p-6 text-center">
                         <div class="relative inline-block mb-3">
                             <div class="w-16 h-16 rounded-full bg-gray-200 overflow-hidden mx-auto">
-                                <img src="{{ $owner?->avatar ? $resolveImage($owner->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=F47C20&color=fff&size=128' }}" alt="{{ $ownerName }}" class="w-full h-full object-cover">
+                                <img src="{{ $owner?->avatar ? resolve_image_url($owner->avatar, $fallbackImage) : 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=F47C20&color=fff&size=128' }}" alt="{{ $ownerName }}" class="w-full h-full object-cover">
                             </div>
                             <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                         </div>

@@ -13,7 +13,7 @@
 
             {{-- Left Side - Illustration --}}
             <div class="w-full md:w-1/2 bg-gradient-to-br from-orange-50 to-orange-100 p-10 flex flex-col justify-center items-center text-center relative overflow-hidden">
-                <img src="{{ asset('images/login-illustration.png') }}" alt="Ilustrasi" class="w-full max-w-[320px] rounded-2xl mb-8 relative z-10 shadow-lg">
+                <img src="{{ asset('images/login-illustration.png') }}" alt="Ilustrasi" class="w-full max-w-[320px] rounded-2xl mb-8 relative z-10 shadow-lg" loading="lazy">
                 <div class="relative z-10">
                     <h2 class="text-2xl font-bold text-text mb-3">Memulai Babak Baru</h2>
                     <p class="text-text-muted text-sm max-w-[280px] mx-auto leading-relaxed">

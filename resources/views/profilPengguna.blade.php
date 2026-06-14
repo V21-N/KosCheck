@@ -106,7 +106,7 @@
             @foreach($recentBookings as $booking)
             <div class="card p-3 border border-border flex flex-col sm:flex-row items-center gap-4 hover:border-primary/40 transition-colors shadow-sm bg-white mb-3" data-hover="lift" data-reveal>
                 <div class="w-full sm:w-40 h-28 rounded-lg overflow-hidden flex-shrink-0 relative">
-                    <img src="{{ $booking->kos?->photos->first()?->url ? (str_starts_with($booking->kos->photos->first()->url, 'http') ? $booking->kos->photos->first()->url : asset('storage/' . $booking->kos->photos->first()->url)) : asset('images/hero-illustration.png') }}" class="w-full h-full object-cover">
+                    <img src="{{ resolve_image_url($booking->kos?->photos->first()?->url) }}" class="w-full h-full object-cover" loading="lazy">
                 </div>
                 <div class="flex-1 w-full py-1 pr-2">
                     <div class="flex justify-between items-start mb-1">
@@ -152,7 +152,7 @@
                 @foreach($favoriteKos as $kos)
                 <div class="card group shadow-sm bg-white" data-hover="lift" data-reveal>
                     <div class="relative overflow-hidden aspect-[4/3]">
-                        <img src="{{ $kos->photos->first()?->url ? (str_starts_with($kos->photos->first()->url, 'http') ? $kos->photos->first()->url : asset('storage/' . $kos->photos->first()->url)) : asset('images/hero-illustration.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                        <img src="{{ resolve_image_url($kos->photos->first()?->url) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                         @if($kos->status === 'active' && $kos->is_active)
                         <span class="absolute bottom-3 left-3 badge badge-verified text-[0.65rem] bg-green-700 text-white border border-green-800">
                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>

@@ -20,100 +20,85 @@ import { initScrollAnimation } from './scroll-animation';
  * Call this function on DOMContentLoaded
  */
 export function initializeAllFeatures() {
-    console.log('🚀 Initializing all features...');
-    
-    try {
-        initScrollAnimation();
-        console.log('✓ Scroll Animation initialized');
-    } catch (e) {
-        console.warn('⚠ Scroll Animation error:', e);
-    }
-    
+    // Disabled for mobile performance - scroll animations cause jank on low-end devices
+    // try {
+    //     initScrollAnimation();
+    // } catch (e) {
+    //     console.warn('⚠ Scroll Animation error:', e);
+    // }
+
     try {
         initSmoothScroll();
-        console.log('✓ Smooth Scroll initialized');
     } catch (e) {
-        console.warn('⚠ Smooth Scroll error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initStickyNavbar();
-        console.log('✓ Sticky Navbar initialized');
     } catch (e) {
-        console.warn('⚠ Sticky Navbar error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initDarkMode();
-        console.log('✓ Dark Mode initialized');
     } catch (e) {
-        console.warn('⚠ Dark Mode error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initSkeletonLoading();
-        console.log('✓ Skeleton Loading initialized');
     } catch (e) {
-        console.warn('⚠ Skeleton Loading error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initLazyLoad();
-        console.log('✓ Lazy Load initialized');
     } catch (e) {
-        console.warn('⚠ Lazy Load error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initMobileMenu();
-        console.log('✓ Mobile Menu initialized');
     } catch (e) {
-        console.warn('⚠ Mobile Menu error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initFormValidation();
-        console.log('✓ Form Validation initialized');
     } catch (e) {
-        console.warn('⚠ Form Validation error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initBackToTop();
-        console.log('✓ Back to Top initialized');
     } catch (e) {
-        console.warn('⚠ Back to Top error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initHoverAnimations();
-        console.log('✓ Hover Animations initialized');
     } catch (e) {
-        console.warn('⚠ Hover Animations error:', e);
+        // Silent fail for non-critical features
     }
-    
+
     try {
         initMicroInteractions();
-        console.log('✓ Micro Interactions initialized');
     } catch (e) {
-        console.warn('⚠ Micro Interactions error:', e);
+        // Silent fail for non-critical features
     }
-    
-    try {
-        initPageTransition();
-        console.log('✓ Page Transition initialized');
-    } catch (e) {
-        console.warn('⚠ Page Transition error:', e);
-    }
-    
-    try {
-        initScrollReveal();
-        console.log('✓ Scroll Reveal initialized');
-    } catch (e) {
-        console.warn('⚠ Scroll Reveal error:', e);
-    }
-    
-    console.log('✅ All features initialized successfully!');
+
+    // Disabled for mobile performance
+    // try {
+    //     initPageTransition();
+    // } catch (e) {
+    //     console.warn('⚠ Page Transition error:', e);
+    // }
+
+    // try {
+    //     initScrollReveal();
+    // } catch (e) {
+    //     console.warn('⚠ Scroll Reveal error:', e);
+    // }
 }
 
 // Export all functions globally

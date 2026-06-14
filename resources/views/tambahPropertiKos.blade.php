@@ -75,6 +75,11 @@
                     @endif
                     <input type="hidden" name="gender" :value="form.gender">
                     <input type="hidden" name="whatsapp" :value="'{{ auth()->user()->phone ?? '' }}'">
+                    <input type="hidden" name="total_rooms" :value="form.totalRooms">
+                    <input type="hidden" name="available_rooms" :value="form.availableRooms">
+                    <input type="hidden" name="room_size" :value="form.roomSize">
+                    <input type="hidden" name="deposit" :value="form.deposit">
+                    <input type="hidden" name="long_stay_discount" :value="form.longStayDiscount ? 1 : 0">
 
                     {{-- 1. FOTO & MEDIA --}}
                     <div class="bg-white rounded-2xl border border-border-light p-8 shadow-sm">
@@ -84,7 +89,7 @@
                                     <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">1</span>
                                     Foto Properti
                                 </h3>
-                                <p class="text-sm text-text-muted mt-1">Upload foto berkualitas tinggi. Maksimal 8 foto.</p>
+                                <p class="text-sm text-text-muted mt-1">Upload foto berkualitas tinggi. Maksimal 10 foto.</p>
                             </div>
                             <div class="text-xs px-3 py-1 bg-orange-100 text-orange-700 rounded-full font-semibold">Wajib</div>
                         </div>
@@ -97,7 +102,7 @@
                             @dragleave.prevent="dragOver = false"
                             :class="{ 'border-primary bg-primary/5': dragOver }"
                             class="border-2 border-dashed border-border-light hover:border-primary rounded-2xl p-10 text-center cursor-pointer transition-all group">
-                            <input type="file" x-ref="fileInput" multiple accept="image/*" class="hidden" @change="handleFileSelect($event)">
+                            <input type="file" x-ref="fileInput" multiple accept="image/jpeg,image/png,image/jpg,image/gif,image/webp,image/heic" class="hidden" @change="handleFileSelect($event)">
                             
                             <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-orange-100 flex items-center justify-center group-hover:scale-110 transition">
                                 <svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,13 +110,13 @@
                                 </svg>
                             </div>
                             <p class="font-semibold text-text">Tarik foto ke sini atau <span class="text-primary">klik untuk upload</span></p>
-                            <p class="text-xs text-text-muted mt-1">PNG, JPG • Maks 5MB per foto • Rekomendasi: 1200×800px</p>
+                            <p class="text-xs text-text-muted mt-1">Format: JPEG, PNG, JPG, GIF, WebP, HEIC • Maks 5MB per foto • Rekomendasi: 1200×800px</p>
                         </div>
 
                         {{-- Preview Gambar --}}
                         <div x-show="form.images.length > 0" class="mt-6">
                             <div class="flex items-center justify-between mb-3">
-                                <span class="text-sm font-semibold text-text">Foto Terunggah (<span x-text="form.images.length"></span>/8)</span>
+                                <span class="text-sm font-semibold text-text">Foto Terunggah (<span x-text="form.images.length"></span>/10)</span>
                                 <button type="button" @click="clearAllImages" class="text-xs text-red-500 hover:text-red-600 font-medium">Hapus Semua</button>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -515,27 +520,18 @@ function kosFormData() {
                     return $slugToKey[$f->slug] ?? $f->slug;
                 })->values()->all()
             ) : '[]' !!},
-            rules: []
+            rules: {!! json_encode(old('rules', $kos->rules ?? [])) !!}
         },
 
         init() {
             @if(isset($kos))
                 let existingImages = [];
                 @foreach($kos->photos->sortBy('order') as $photo)
-                    @php
-                        $path = trim((string) $photo->url);
-                        if (preg_match('/^(https?:|data:)/i', $path)) {
-                            $previewUrl = $path;
-                        } elseif (str_starts_with($path, '/')) {
-                            $previewUrl = $path;
-                        } else {
-                            $previewUrl = asset('storage/' . ltrim($path, '/'));
-                        }
-                    @endphp
                     existingImages.push({
+                        id: {!! json_encode($photo->id) !!},
                         file: null,
                         name: {!! json_encode($photo->id) !!},
-                        preview: {!! json_encode($previewUrl) !!},
+                        preview: {!! json_encode(resolve_image_url($photo->url)) !!},
                         isCover: {{ $photo->is_primary ? 'true' : 'false' }},
                     });
                 @endforeach
@@ -595,10 +591,11 @@ function kosFormData() {
 
         addImages(files) {
             files.forEach(file => {
-                if (this.form.images.length >= 8) return;
+                if (this.form.images.length >= 10) return;
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     this.form.images.push({
+                        id: null, // New photos don't have ID yet
                         file,
                         name: file.name.split('.')[0].substring(0, 12),
                         preview: ev.target.result,
@@ -611,6 +608,15 @@ function kosFormData() {
 
         removeImage(index) {
             const wasCover = this.form.images[index].isCover;
+            // If it's an existing photo (has ID), track it for deletion
+            const photoId = this.form.images[index].id;
+            if (photoId !== null && photoId !== undefined) {
+                // Track this photo ID to be deleted on server
+                if (!this.deletedPhotoIds) {
+                    this.deletedPhotoIds = [];
+                }
+                this.deletedPhotoIds.push(photoId);
+            }
             this.form.images.splice(index, 1);
             if (wasCover && this.form.images.length > 0) {
                 this.form.images[0].isCover = true;
@@ -622,6 +628,15 @@ function kosFormData() {
         },
 
         clearAllImages() {
+            // Track all existing photos for deletion
+            this.form.images.forEach(img => {
+                if (img.id !== null && img.id !== undefined) {
+                    if (!this.deletedPhotoIds) {
+                        this.deletedPhotoIds = [];
+                    }
+                    this.deletedPhotoIds.push(img.id);
+                }
+            });
             this.form.images = [];
         },
 
@@ -670,6 +685,49 @@ function kosFormData() {
                 || form.querySelector('input[name="_token"]')?.value
                 || '';
 
+            // Get actual form method (supports PUT for edit mode)
+            const method = form.querySelector('input[name="_method"]')?.value || form.method.toUpperCase() || 'POST';
+
+            // Remove existing hidden rules input and re-add as proper array
+            formData.delete('rules');
+
+            // Send rules as array (rules[] = item1, rules[] = item2, etc.)
+            if (this.form.rules && this.form.rules.length > 0) {
+                this.form.rules.forEach((rule) => {
+                    formData.append('rules[]', rule);
+                });
+            }
+
+            // Send deleted photo IDs
+            if (this.deletedPhotoIds && this.deletedPhotoIds.length > 0) {
+                this.deletedPhotoIds.forEach((id) => {
+                    formData.append('deleted_photos[]', id);
+                });
+            }
+
+            // Send photo order data (for all photos - both new and existing)
+            this.form.images.forEach((image, index) => {
+                // Send photo ID if exists (for existing photos)
+                if (image.id !== null && image.id !== undefined) {
+                    formData.append('photo_order[]', image.id);
+                } else {
+                    // For new photos, use negative index to distinguish from existing
+                    formData.append('photo_order[]', 'new_' + index);
+                }
+                // Send is_cover flag
+                formData.append('is_cover[]', image.isCover ? '1' : '0');
+            });
+
+            // Manually set other Alpine.js values to ensure they're sent
+            formData.set('gender', this.form.gender);
+            formData.set('whatsapp', '{{ auth()->user()->phone ?? '' }}');
+            formData.set('total_rooms', this.form.totalRooms);
+            formData.set('available_rooms', this.form.availableRooms);
+            formData.set('room_size', this.form.roomSize);
+            formData.set('deposit', this.form.deposit);
+            formData.set('long_stay_discount', this.form.longStayDiscount ? 1 : 0);
+
+            // Append new photos only
             this.form.images.forEach((image) => {
                 if (image.file) {
                     formData.append('photos[]', image.file);
@@ -678,7 +736,7 @@ function kosFormData() {
 
             try {
                 const response = await fetch(form.action, {
-                    method: 'POST',
+                    method: method,
                     body: formData,
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,

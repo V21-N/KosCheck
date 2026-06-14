@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => \App\Http\Middleware\Authenticate::class,
             'role' => \App\Http\Middleware\CheckRole::class,
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'guest_guard' => \App\Http\Middleware\GuestGuard::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -78,17 +78,8 @@
             <div class="card group">
                 <div class="relative overflow-hidden aspect-[4/3]">
                     @php
-                        $primaryPhoto = $kos->photos->first();
-                        if ($primaryPhoto) {
-                            $path = trim((string) $primaryPhoto->url);
-                            if (preg_match('/^(https?:|data:)/i', $path) || str_starts_with($path, '/')) {
-                                $imageSrc = $path;
-                            } else {
-                                $imageSrc = asset('storage/' . ltrim($path, '/'));
-                            }
-                        } else {
-                            $imageSrc = asset('images/hero-illustration.png');
-                        }
+                        $coverPhoto = $kos->cover_photo;
+                        $imageSrc = resolve_image_url($coverPhoto?->url);
                     @endphp
                     <img src="{{ $imageSrc }}" alt="{{ $kos->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                     @if($kos->is_active && $kos->status === 'active')
