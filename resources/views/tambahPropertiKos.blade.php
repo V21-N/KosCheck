@@ -685,8 +685,9 @@ function kosFormData() {
                 || form.querySelector('input[name="_token"]')?.value
                 || '';
 
-            // Get actual form method (supports PUT for edit mode)
-            const method = form.querySelector('input[name="_method"]')?.value || form.method.toUpperCase() || 'POST';
+            // For multipart/form-data, HTTP method MUST be POST. 
+            // Laravel handles PUT via the _method field in FormData.
+            const method = 'POST';
 
             // Remove existing hidden rules input and re-add as proper array
             formData.delete('rules');
@@ -729,8 +730,12 @@ function kosFormData() {
 
             // Append new photos only
             this.form.images.forEach((image) => {
-                if (image.file) {
-                    formData.append('photos[]', image.file);
+                // AlpineJS proxies objects which can cause FormData to stringify File objects as "[object Object]"
+                // We must extract the raw File object to properly upload the binary data.
+                const rawFile = (typeof Alpine !== 'undefined' && Alpine.raw) ? Alpine.raw(image.file) : image.file;
+                
+                if (rawFile) {
+                    formData.append('photos[]', rawFile);
                 }
             });
 

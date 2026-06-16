@@ -274,14 +274,21 @@ class DashboardController extends Controller
                     'rules' => $validated['rules'] ?? [],
                 ]);
 
+                $photoOrders = $request->input('photo_order', []);
+                $isCovers = $request->input('is_cover', []);
+
                 foreach ($request->file('photos', []) as $index => $photo) {
                     $path = $photo->store('kos-photos', 'public');
                     $uploadedPhotoPaths[] = $path;
 
+                    // Match with photo_order to get correct is_primary and order
+                    $isPrimary = isset($isCovers[$index]) && $isCovers[$index] === '1';
+                    $order = isset($photoOrders[$index]) ? (int) str_replace('new_', '', $photoOrders[$index]) : $index;
+
                     $kos->photos()->create([
                         'url' => $path,
-                        'order' => $index,
-                        'is_primary' => $index === 0,
+                        'order' => $order,
+                        'is_primary' => $isPrimary,
                     ]);
                 }
 

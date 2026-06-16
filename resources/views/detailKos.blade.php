@@ -77,16 +77,16 @@
 
         <div class="gallery-grid mb-8">
             <div class="gallery-main img-overlay rounded-2xl h-[250px] md:h-[400px]">
-                <img src="{{ resolve_image_url($galleryPhotos[0]?->url, $fallbackImage) }}" alt="{{ $gallerySlots[0] }}" loading="lazy">
+                <img src="{{ resolve_image_url($galleryPhotos->get(0)?->url, $fallbackImage) }}" alt="{{ $gallerySlots[0] }}" loading="lazy">
                 <span class="img-label rounded-b-2xl">{{ $gallerySlots[0] }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 md:contents">
                 <div class="img-overlay rounded-2xl h-[120px] md:h-[196px]">
-                    <img src="{{ resolve_image_url($galleryPhotos[1]?->url, $fallbackImage) }}" alt="{{ $gallerySlots[1] }}" loading="lazy">
+                    <img src="{{ resolve_image_url($galleryPhotos->get(1)?->url, $fallbackImage) }}" alt="{{ $gallerySlots[1] }}" loading="lazy">
                     <span class="img-label rounded-b-2xl text-[0.65rem] md:text-xs">{{ $gallerySlots[1] }}</span>
                 </div>
                 <div class="img-overlay rounded-2xl h-[120px] md:h-[196px]">
-                    <img src="{{ resolve_image_url($galleryPhotos[2]?->url, $fallbackImage) }}" alt="{{ $gallerySlots[2] }}" loading="lazy">
+                    <img src="{{ resolve_image_url($galleryPhotos->get(2)?->url, $fallbackImage) }}" alt="{{ $gallerySlots[2] }}" loading="lazy">
                     <span class="img-label rounded-b-2xl text-[0.65rem] md:text-xs">{{ $gallerySlots[2] }}</span>
                 </div>
             </div>

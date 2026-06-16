@@ -94,7 +94,7 @@ class Kos extends Model implements HasMedia
 
     public function photos(): HasMany
     {
-        return $this->hasMany(Photo::class)->orderByRaw("CASE WHEN is_primary = 1 THEN 0 ELSE 1 END")->orderBy('order');
+        return $this->hasMany(Photo::class)->orderByDesc('is_primary')->orderBy('order');
     }
 
     public function getCoverPhotoAttribute(): ?Photo
