@@ -17,7 +17,7 @@ class KosService
     public function getActiveKos(?Request $request = null): LengthAwarePaginator
     {
         $query = Kos::active()
-            ->with(['photos' => fn($q) => $q->orderBy('is_primary', 'desc')->orderBy('order'), 'facilities', 'reviews']);
+            ->with(['owner', 'photos' => fn($q) => $q->orderBy('is_primary', 'desc')->orderBy('order'), 'facilities', 'reviews']);
 
         $query = $this->applyFilters($query, $request);
 

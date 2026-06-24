@@ -22,7 +22,7 @@ class KosController extends Controller
 
         // --- Saved Kos ---
         $savedKos = $user->favoriteKos()
-            ->with('primaryPhoto')
+            ->with(['photos' => fn($q) => $q->orderByDesc('is_primary')->orderBy('order')])
             ->latest('favorite_kos.created_at')
             ->take(3)
             ->get();

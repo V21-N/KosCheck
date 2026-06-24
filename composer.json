@@ -10,7 +10,9 @@
         "anthropic-ai/sdk": "^0.24.0",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.28",
         "laravel/tinker": "^3.0",
+        "midtrans/midtrans-php": "^2.6",
         "predis/predis": "^2.0",
         "spatie/laravel-medialibrary": "^11.23"
     },

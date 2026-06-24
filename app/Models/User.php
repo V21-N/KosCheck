@@ -15,7 +15,21 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role', 'university', 'phone', 'avatar'];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'university',
+        'phone',
+        'address',
+        'avatar',
+        // Google OAuth fields
+        'google_id',
+        'google_token',
+        'google_refresh_token',
+        'google_avatar_fetched',
+    ];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -24,6 +38,9 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
         'last_seen_at' => 'datetime',
+        'is_premium' => 'boolean',
+        'premium_started_at' => 'datetime',
+        'premium_expired_at' => 'datetime',
     ];
 
     public function kos(): HasMany
@@ -59,6 +76,47 @@ class User extends Authenticatable
     public function favoriteKos(): BelongsToMany
     {
         return $this->belongsToMany(Kos::class, 'favorite_kos')->withTimestamps();
+    }
+
+    // KosCheck+ Premium Relationships
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function activeSubscription(): HasMany
+    {
+        return $this->hasMany(Subscription::class)
+            ->where('status', 'active')
+            ->where('expired_at', '>', now());
+    }
+
+    public function isPremiumUser(): bool
+    {
+        return $this->is_premium
+            && $this->premium_expired_at !== null
+            && $this->premium_expired_at->isFuture();
+    }
+
+    public function getDaysUntilExpiryAttribute(): ?int
+    {
+        if (!$this->premium_expired_at) {
+            return null;
+        }
+
+        return max(0, now()->diffInDays($this->premium_expired_at, false));
+    }
+
+    public function scopePremium($query)
+    {
+        return $query->where('is_premium', true)
+            ->whereNotNull('premium_expired_at')
+            ->where('premium_expired_at', '>', now());
     }
 
     public function isAdmin(): bool
@@ -102,5 +160,61 @@ class User extends Authenticatable
     public function scopeByRole($query, string $role)
     {
         return $query->where('role', $role);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Google OAuth Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Check if user is registered via Google OAuth.
+     */
+    public function isGoogleUser(): bool
+    {
+        return !empty($this->google_id);
+    }
+
+    /**
+     * Link Google account to this user.
+     */
+    public function linkGoogleAccount(string $googleId, ?string $token = null, ?string $refreshToken = null): bool
+    {
+        $this->update([
+            'google_id' => $googleId,
+            'google_token' => $token,
+            'google_refresh_token' => $refreshToken,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Unlink Google account from this user.
+     */
+    public function unlinkGoogleAccount(): bool
+    {
+        // Check if user has a password (can login without Google)
+        if (empty($this->password) || $this->password === '') {
+            return false; // Can't unlink if no password set
+        }
+
+        $this->update([
+            'google_id' => null,
+            'google_token' => null,
+            'google_refresh_token' => null,
+            'google_avatar_fetched' => false,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Check if user can login with Google.
+     */
+    public function canLoginWithGoogle(): bool
+    {
+        return $this->is_active && $this->isGoogleUser();
     }
 }

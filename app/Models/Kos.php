@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\Image\Manipulations;
@@ -97,6 +98,11 @@ class Kos extends Model implements HasMedia
         return $this->hasMany(Photo::class)->orderByDesc('is_primary')->orderBy('order');
     }
 
+    public function primaryPhoto(): HasOne
+    {
+        return $this->hasOne(Photo::class)->where('is_primary', true)->orderBy('order');
+    }
+
     public function getCoverPhotoAttribute(): ?Photo
     {
         // Get primary photo (is_primary = true) based on flag, not first in order
@@ -121,6 +127,22 @@ class Kos extends Model implements HasMedia
     public function reports(): MorphMany
     {
         return $this->morphMany(Report::class, 'reportable');
+    }
+
+    // KosCheck+ Analytics Relationships
+    public function propertyViews(): HasMany
+    {
+        return $this->hasMany(PropertyView::class);
+    }
+
+    public function propertyFavorites(): HasMany
+    {
+        return $this->hasMany(PropertyFavorite::class);
+    }
+
+    public function whatsappClicks(): HasMany
+    {
+        return $this->hasMany(WhatsappClick::class);
     }
 
     public function getAverageRatingAttribute(): ?float
@@ -154,7 +176,7 @@ class Kos extends Model implements HasMedia
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)->where('status', 'active');
+        return $query->where('kos.is_active', true)->where('status', 'active');
     }
 
     public function scopePremium($query)
@@ -174,8 +196,14 @@ class Kos extends Model implements HasMedia
 
     public function scopePremiumFirst($query)
     {
-        return $query->orderByRaw("CASE WHEN is_premium = 1 THEN 0 ELSE 1 END")
-            ->orderBy('created_at', 'desc');
+        // First priority: owner's KosCheck+ premium status
+        // Second priority: property's own premium status (legacy)
+        return $query
+            ->select('kos.*')
+            ->join('users', 'kos.user_id', '=', 'users.id')
+            ->orderByRaw("CASE WHEN users.is_premium = 1 AND (users.premium_expired_at IS NULL OR users.premium_expired_at > NOW()) THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN kos.is_premium = 1 THEN 0 ELSE 1 END")
+            ->orderBy('kos.created_at', 'desc');
     }
 
     public function scopeSearch($query, ?string $search)

@@ -22,8 +22,11 @@ use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\ProfileController;
-use App\Models\User;
+use App\Http\Controllers\Payment\MidtransController;
+use App\Http\Controllers\Api\V1\AnalyticsController;
+use App\Http\Controllers\Owner\KosCheckPlusController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -66,6 +69,18 @@ Route::middleware('guest_guard')->group(function () {
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-password/{token}', [NewPasswordController::class, 'store'])->name('password.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Google OAuth Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('auth/google')->name('auth.google.')->group(function () {
+        Route::get('/redirect', [GoogleOAuthController::class, 'redirect'])->name('redirect');
+        Route::get('/callback', [GoogleOAuthController::class, 'callback'])->name('callback');
+        Route::get('/role-select', [GoogleOAuthController::class, 'showRoleSelection'])->name('role-select')->middleware('throttle:5,1');
+        Route::post('/select-role', [GoogleOAuthController::class, 'selectRole'])->name('select-role')->middleware('throttle:5,1');
+    });
 });
 
 /*
@@ -142,7 +157,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/booking', [DashboardController::class, 'bookingIndex'])->name('dashboard.booking');
         Route::post('/booking/{booking}/status', [DashboardController::class, 'bookingUpdateStatus'])->name('dashboard.booking.status');
-        Route::view('/pengaturan', 'pengaturanAkun')->name('dashboard.pengaturan');
+        
+        // ✅ PERBAIKI: Route untuk Pengaturan Akun
+        Route::get('/pengaturan', [App\Http\Controllers\Owner\ProfileController::class, 'edit'])->name('dashboard.pengaturan');
+        Route::put('/pengaturan', [App\Http\Controllers\Owner\ProfileController::class, 'update'])->name('dashboard.pengaturan.update');
+        Route::put('/pengaturan/password', [App\Http\Controllers\Owner\ProfileController::class, 'updatePassword'])->name('dashboard.pengaturan.password');
+        
         Route::get('/notifikasi', [NotificationController::class, 'index'])->name('dashboard.notifikasi');
         Route::get('/notifikasi/{notification}/open', [NotificationController::class, 'open'])->name('dashboard.notifikasi.open');
         Route::post('/notifikasi/{notification}/read', [NotificationController::class, 'markAsRead'])->name('dashboard.notifikasi.read');
@@ -152,6 +172,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/presence/heartbeat', [DashboardController::class, 'heartbeat'])->name('dashboard.presence.heartbeat');
 
         Route::get('/tambah-properti', fn() => redirect()->route('dashboard.kos.create'))->name('dashboard.tambah-properti');
+        
+        /*
+        |--------------------------------------------------------------------------
+        | KosCheck+ Premium Routes
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('koscheck-plus')->name('koscheck-plus.')->group(function () {
+            Route::get('/', [KosCheckPlusController::class, 'index'])->name('index');
+            Route::get('/checkout', [KosCheckPlusController::class, 'checkout'])->name('checkout');
+            Route::post('/checkout', [KosCheckPlusController::class, 'initiatePayment'])->name('initiate-payment');
+            Route::get('/payment/{transaction}', [KosCheckPlusController::class, 'payment'])->name('payment');
+            Route::get('/history', [KosCheckPlusController::class, 'history'])->name('history');
+            Route::post('/cancel', [KosCheckPlusController::class, 'cancel'])->name('cancel');
+            Route::get('/widget', [KosCheckPlusController::class, 'widgetData'])->name('widget');
+        });
     });
 
     /*
@@ -224,3 +259,27 @@ Route::post('/report', [ReportController::class, 'store'])->name('report.submit'
 Route::get('/cari-kos', fn() => redirect()->route('kos.index'))->name('cari-kos');
 Route::get('/detail-kos/{slug}', fn(string $slug) => redirect()->route('kos.show', ['slug' => $slug]))->name('detail-kos');
 Route::get('/admin/reports', fn() => redirect()->route('admin'))->name('admin.reports');
+
+/*
+|--------------------------------------------------------------------------
+| Midtrans Payment Routes (Public - No CSRF)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('payment/midtrans')->name('payment.midtrans.')->withoutMiddleware(['csrf'])->group(function () {
+    Route::post('/callback', [MidtransController::class, 'callback'])->name('callback');
+    Route::get('/finish', [MidtransController::class, 'finish'])->name('finish');
+    Route::get('/error', [MidtransController::class, 'error'])->name('error');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Analytics API Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->prefix('api/v1/analytics')->name('api.v1.analytics.')->group(function () {
+    Route::post('/view/{slug}', [AnalyticsController::class, 'trackView'])->name('view');
+    Route::post('/favorite/{slug}', [AnalyticsController::class, 'trackFavorite'])->name('favorite');
+    Route::delete('/favorite/{slug}', [AnalyticsController::class, 'removeFavorite'])->name('favorite.remove');
+    Route::post('/whatsapp/{slug}', [AnalyticsController::class, 'trackWhatsapp'])->name('whatsapp');
+    Route::get('/property/{slug}', [AnalyticsController::class, 'propertyStats'])->name('property');
+});
